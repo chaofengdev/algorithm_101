@@ -407,7 +407,61 @@ public class Client {
 
 要求：给出实例类图和实例代码，并作出相应解释。
 
+![image-20220926093641923](https://typora-1256823886.cos.ap-nanjing.myqcloud.com//2021/image-20220926093641923.png)
 
+```java
+//ps：其实本质上就是依赖倒置原则的应用。
+//抽象排序类--抽象策略类
+public class Sort {
+	 public int[] sort(int[] arr);
+}
+//具体排序类--具体策略类
+public class BubbleSort implements Sort {
+	public int[] sort(int[] arr) {
+        ... //排序逻辑，略
+        return arr;
+    }
+}
+public class SelectionSort implements Sort {
+    public int[] sort(int[] arr) {
+        ... //排序逻辑，略
+        return arr;
+    }
+}
+public class InsertionSort implements Sort {
+    public int[] sort(int[] arr) {
+        ... //排序逻辑，略
+        return arr;
+    }
+}
+//上下文环境类ArrayHandler
+public class ArrayHandler {
+    private Sort sortObj;
+    public int[] sort(int[] arr) {
+        sortObj.sort(arr);
+        return arr;
+    }
+    public void setSortObj(Sort sortObj) {
+        this.sortObj = sortObj;
+    }
+}
+```
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        int[] arr = {1,3,8,5,4,0,9,2};
+        ArrayHandler ah = new ArrayHandler();//实例化上下文对象
+        Sort sort = new InsertionSort();//实例化具体策略对象
+        ah.setSortObj(sort);//为上下文设置具体策略
+        int[] res;
+        res = ah.sort(arr);//执行具体策略
+        for(int i = 0; i < res.length; i++) {//打印输出
+            System.out.print(res[i] + ",");
+        }
+    }
+}
+```
 
 
 
@@ -420,3 +474,173 @@ public class Client {
 这里我们可以看到，电视机就是抽象聚合类，电视品牌就是具体聚合类，类中保存的就是电视台清单（当然也可以理解为电视节目），目前的要求就是遍历某个品牌的电视台清单。
 
 要求：给出实例类图和实例代码，并作出相应解释。
+
+![image-20220926095758483](https://typora-1256823886.cos.ap-nanjing.myqcloud.com//2021/image-20220926095758483.png)
+
+```java
+//抽象迭代器
+public interface TVIterator {
+    public Object next();
+    pubilc boolean hasNext();
+}
+//抽象聚合类
+public interface Television {
+    public TVIterator createIterator();
+}
+//具体聚合类HaierTelevision
+public class HaierTelevision implements Television {
+    private Object[] obj = {"CCTV-1","CCTV-2","CCTV-3","CCTV-4","CCTV-5"};
+    public TVIterator createIterator() {
+        return new HaierIterator();
+    }
+    //内部类
+    private class HaierIterator implements TVIterator {
+        private int index = 0;
+        public Object next() {
+            if(this.hasNext()) {
+                return obj[index++];
+            }
+            return null;
+        }
+        public boolean hasNext() {
+            if(index < obj.length) {
+                return true;
+            }
+            return false;
+        }
+    }
+}
+//具体聚合类BcerTelevision
+public class HaierTelevision implements Television {
+    private Object[] obj = {"湖南卫视","江苏卫视","福建卫视","...","..."};
+    public TVIterator createIterator() {
+        return new BcerIterator();
+    }
+    //内部类
+    private class BcerIterator implements TVIterator {
+        private int index = 0;
+        public Object next() {
+            if(this.hasNext()) {
+                return obj[index++];
+            }
+            return null;
+        }
+        public boolean hasNext() {
+            if(index < obj.length) {
+                return true;
+            }
+            return false;
+        }
+    }
+}
+```
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        Television tv = new HaierTelevision();//先有具体聚合类（集合）
+        TVIterator iterator = tv.createIterator();//再有迭代器对象
+        //通过迭代器对象访问集合
+        while(iterator.hasNext()) {
+            System.out.println(iterator.next().toString());
+        }
+    }
+}
+```
+
+> 以下是一点补充。
+>
+> 迭代器模式在java集合中广泛应用。比如Collection集合有很多子类ArrayList、LinkedList，Collection中有一个方法iterator()，返回Iterator类型的迭代器对象，通过这个对象就可以遍历集合中的所有元素。Collection集合返回抽象迭代器对象，其子类返回具体迭代器对象。
+>
+> 并且我们很少使用自定义迭代器，一般都是使用JDK内置的迭代器。下面是JDK源码。
+>
+> ```java
+> //源码比较复杂，细枝末节很多，这里只是大意
+> //AbstractList.java
+> public ListIterator<E> listIterator() {
+> 	return listIterator(0);
+> }
+> //Iterator.java
+> public interface Iterator<E> {
+>     /**
+>      * Returns {@code true} if the iteration has more elements.
+>      * (In other words, returns {@code true} if {@link #next} would
+>      * return an element rather than throwing an exception.)
+>      *
+>      * @return {@code true} if the iteration has more elements
+>      */
+>     boolean hasNext();
+> 
+>     /**
+>      * Returns the next element in the iteration.
+>      *
+>      * @return the next element in the iteration
+>      * @throws NoSuchElementException if the iteration has no more elements
+>      */
+>     E next();
+> 
+>     /**
+>      * Removes from the underlying collection the last element returned
+>      * by this iterator (optional operation).  This method can be called
+>      * only once per call to {@link #next}.
+>      * <p>
+>      * The behavior of an iterator is unspecified if the underlying collection
+>      * is modified while the iteration is in progress in any way other than by
+>      * calling this method, unless an overriding class has specified a
+>      * concurrent modification policy.
+>      * <p>
+>      * The behavior of an iterator is unspecified if this method is called
+>      * after a call to the {@link #forEachRemaining forEachRemaining} method.
+>      *
+>      * @implSpec
+>      * The default implementation throws an instance of
+>      * {@link UnsupportedOperationException} and performs no other action.
+>      *
+>      * @throws UnsupportedOperationException if the {@code remove}
+>      *         operation is not supported by this iterator
+>      *
+>      * @throws IllegalStateException if the {@code next} method has not
+>      *         yet been called, or the {@code remove} method has already
+>      *         been called after the last call to the {@code next}
+>      *         method
+>      */
+>     default void remove() {
+>         throw new UnsupportedOperationException("remove");
+>     }
+> 
+>     /**
+>      * Performs the given action for each remaining element until all elements
+>      * have been processed or the action throws an exception.  Actions are
+>      * performed in the order of iteration, if that order is specified.
+>      * Exceptions thrown by the action are relayed to the caller.
+>      * <p>
+>      * The behavior of an iterator is unspecified if the action modifies the
+>      * collection in any way (even by calling the {@link #remove remove} method
+>      * or other mutator methods of {@code Iterator} subtypes),
+>      * unless an overriding class has specified a concurrent modification policy.
+>      * <p>
+>      * Subsequent behavior of an iterator is unspecified if the action throws an
+>      * exception.
+>      *
+>      * @implSpec
+>      * <p>The default implementation behaves as if:
+>      * <pre>{@code
+>      *     while (hasNext())
+>      *         action.accept(next());
+>      * }</pre>
+>      *
+>      * @param action The action to be performed for each element
+>      * @throws NullPointerException if the specified action is null
+>      * @since 1.8
+>      */
+>     default void forEachRemaining(Consumer<? super E> action) {
+>         Objects.requireNonNull(action);
+>         while (hasNext())
+>             action.accept(next());
+>     }
+> }
+> //算了，看源码有点累，没耐心看了。以后有空重新整理这部分的内容。
+> //注意迭代器模式里的Interator类要和Collection的父接口Iterable区分。
+> //https://www.cnblogs.com/litexy/p/9744241.html
+> ```
+
