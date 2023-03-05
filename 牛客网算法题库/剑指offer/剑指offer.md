@@ -190,3 +190,98 @@ public class Solution {
 }
 ```
 
+#### 合并两个排序的链表
+
+方法1：双指针
+
+> - step 1：判断空链表的情况，只要有一个链表为空，那答案必定就是另一个链表了，就算另一个链表也为空。
+> - step 2：新建一个空的表头后面连接两个链表排序后的节点，两个指针分别指向两链表头。
+> - step 3：遍历两个链表都不为空的情况，取较小值添加在新的链表后面，每次只把被添加的链表的指针后移。
+> - step 4：遍历到最后肯定有一个链表还有剩余的节点，它们的值将大于前面所有的，直接连在新的链表后面即可。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/82953D04639BD2356F6032F90DAF845F)
+
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        //判空
+        if(list1 == null) {
+            return list2;
+        }
+        if(list2 == null) {
+            return list1;
+        }
+        ListNode cur1 = list1;
+        ListNode cur2 = list2;
+        ListNode dummyNode = new ListNode(0);//虚拟节点 该节点的作用是表示一个新的链表
+        ListNode cur = dummyNode;//新链表的工作指针，负责穿针引线
+        while(cur1 != null && cur2 != null) {
+            if(cur1.val < cur2.val) {
+                cur.next = cur1;
+                cur1 = cur1.next;
+            }else {
+                cur.next = cur2;
+                cur2 = cur2.next;
+            }
+            cur = cur.next;//指针后移
+        }
+        if(cur1 != null) {
+            cur.next = cur1;
+        }else {
+            cur.next = cur2;
+        }
+        return dummyNode.next;
+    }
+}
+
+```
+
+方法2：双指针递归
+
+我只能说，太tm精彩了，我确实没想到。
+
+> - step 1：每次比较两个链表当前节点的值，然后取较小值的链表指针往后，另一个不变，两段子链表作为新的链表送入递归中。
+> - step 2：递归回来的结果我们要加在当前较小值的节点后面，相当于不断在较小值后面添加节点。
+> - step 3：递归的终止是两个链表有一个为空。
+
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        //递归出口
+        if(list1 == null) {
+            return list2;
+        }
+        if(list2 == null) {
+            return list1;
+        }
+        //本级任务
+        if(list1.val <= list2.val) {
+            list1.next = Merge(list1.next, list2);
+            return list1;
+        }else {
+            list2.next = Merge(list1, list2.next);
+            return list2;
+        }
+    }
+}
+
+```
+
