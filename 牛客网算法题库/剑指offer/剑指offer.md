@@ -398,7 +398,7 @@ public class Solution {
 
 
 
-## 链表中环的入口结点
+#### 链表中环的入口结点
 
 ![fig1](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/jianzhi_II_022_fig1.png)
 
@@ -455,6 +455,168 @@ public class Solution {
             }
         }
         return null;
+    }
+}
+```
+
+
+
+#### 链表中倒数最后k个结点
+
+> 这题唤醒了我的一个陈年问题，就是for循环的判断。
+>
+> for循环语句是支持迭代的一种通用结构，是最有效、最灵活的循环结构。for循环在第一次反复之前要进行初始化，即执行初始表达式;随后，对布尔表达式进行判定，若判定结果为true，则执行循环体，否则，终止循环;最后在每一次反复的时候，进行某种形式的“步进”，即执行迭代因子。
+>
+> 即java中，for可以一次不执行，有些语言中for循环必须执行一次，注意区分。
+
+方法1：双指针
+
+方法就是下图，但具体写法，很难第一次就像官方那么优雅。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/15B43339B02E276F1B14C9F3B03A53CF)
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ *   public ListNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param pHead ListNode类 
+     * @param k int整型 
+     * @return ListNode类
+     */
+    public ListNode FindKthToTail (ListNode pHead, int k) {
+        // write code here
+        //判空
+        if(pHead == null) return null;
+        //特例
+        if(k == 0) return null;
+        //特例
+        int len = 0;
+        ListNode cur = pHead;
+        while(cur != null) {
+            cur = cur.next;
+            len++;
+        }
+        if(k > len) return null;//返回长度为0的链表
+        //倒数第n个结点其实就是链表逆序走n-1步
+        ListNode fast = pHead;
+        ListNode slow = pHead;
+        //fast先走k-1步
+        while(k - 1 > 0) {//注意这里的写法
+            fast = fast.next;
+            k--;
+        }
+        //slow、fast同时走，直到fast走到最后一个结点
+        while(fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;//slow指向的即为倒数第k个结点
+    }
+}
+```
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ *   public ListNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param pHead ListNode类 
+     * @param k int整型 
+     * @return ListNode类
+     */
+    public ListNode FindKthToTail (ListNode pHead, int k) {
+        // write code here
+        //双指针
+        ListNode slow = pHead;
+        ListNode fast = pHead;
+        //快指针先走k步
+        for(int i = 0; i < k; i++) {
+            if(fast != null) {
+                fast = fast.next;
+            }else {//达不到k步，说明链表过短（这个判断很精彩）
+                return null;
+            }
+        }
+        //快慢指针同步
+        while(fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+}
+```
+
+方法2：暴力求解
+
+> 上图中，长度为7的链表，倒数第2个，就是正数第6个，也就是走5步（7-2）。
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ *   public ListNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param pHead ListNode类 
+     * @param k int整型 
+     * @return ListNode类
+     */
+    public ListNode FindKthToTail (ListNode pHead, int k) {
+        // write code here
+        //遍历链表统计链表长度
+        int len = 0;
+        ListNode cur = pHead;
+        while(cur != null) {
+            cur = cur.next;
+            len++;
+        }
+        //特例
+        if(len < k) return null;
+        //找到len - k + 1个结点，即走len - k步的结点
+        cur = pHead;
+        for(int i = 0; i < len - k; i++) {
+            cur = cur.next;
+        }
+        return cur;
     }
 }
 ```
