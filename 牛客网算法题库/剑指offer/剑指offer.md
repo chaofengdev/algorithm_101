@@ -396,3 +396,66 @@ public class Solution {
 }
 ```
 
+
+
+## 链表中环的入口结点
+
+![fig1](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/jianzhi_II_022_fig1.png)
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/8B355F0FCD615249270C1B1DEBC84C52)
+
+> 这题标准中档题，表面考察链表，实际考察数学。
+>
+> slow走过`fs=a+b`，fast走过`ff=a+n(b+c)+b`，又因为`ff=2fs`，则`a+n(b+c)+b=2(a+b)`，则
+>
+> `a=(n-1)(b+c)+c`，即从相遇点开始，额外设置指针ptr指向链表头部，随后与slow每次向后移动一个位置，最终在入环点相遇。
+
+> - step 1：使用[BM6.判断链表中是否有环](https://www.nowcoder.com/practice/650474f313294468a4ded3ce0f7898b9?tpId=295&sfm=html&channel=nowcoder)中的方法判断链表是否有环，并找到相遇的节点。
+> - step 2：慢指针继续在相遇节点，快指针回到链表头，两个指针同步逐个元素逐个元素开始遍历链表。
+> - step 3：再次相遇的地方就是环的入口。
+
+```java
+/*
+ public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+
+    public ListNode EntryNodeOfLoop(ListNode pHead) {
+        ListNode slow = hasCycle(pHead);
+        if(slow == null) {//无环，返回null
+            return null;
+        }
+        ListNode ptr = pHead;//快指针回到表头，这里使用ptr代替fast
+        while(ptr != slow) {
+            ptr = ptr.next;
+            slow = slow.next;
+        }
+        return slow;//返回公共点，即入口结点
+    }
+    //判断链表是否有环，有环返回公共点，无环返回null
+    public ListNode hasCycle(ListNode head) {
+        //快慢指针
+        ListNode slow = head;
+        ListNode fast = head;
+        //遍历到公共结点
+        while(fast != null && fast.next != null) {//无环退出并且返回null
+            //快指针移动两步，慢指针移动一步
+            slow = slow.next;
+            fast = fast.next.next;
+            //相遇则有环，返回公共结点
+            if(fast == slow) {
+                return slow;
+            }
+        }
+        return null;
+    }
+}
+```
+
