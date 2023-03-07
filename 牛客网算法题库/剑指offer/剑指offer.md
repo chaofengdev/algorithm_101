@@ -621,3 +621,171 @@ public class Solution {
 }
 ```
 
+#### 复杂链表的复制
+
+#### 删除链表中的重复结点
+
+方法1：直接比较删除
+
+> 这是一个升序链表，重复的节点都连在一起，我们就可以很轻易地比较到重复的节点，然后将所有的连续相同的节点都跳过，连接不相同的第一个节点。
+>
+> 1.增加头结点，方便删除首元节点；定义cur为已经访问过的链表结点，表示这个结点不会和后面的结点重复。
+>
+> 2.每次比较cur.next与cur.next.next元素值，如果不相等，则cur前进1；
+>
+> 3.如果相等，则保存相等的结点元素值，开while循环，依次删除重复结点，直到遇到后续第一个不重复的结点；
+>
+> 4.返回首元结点。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/0A01E83A481A4919FAE203E7BB77FDD3)
+
+```java
+/*
+ public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    public ListNode deleteDuplication(ListNode pHead) {
+        //特例
+        if(pHead == null || pHead.next == null) {
+            return pHead;
+        }
+        //头结点：因为涉及到删除单链表
+        ListNode dummyNode = new ListNode(-1);
+        dummyNode.next = pHead;
+        ListNode cur = dummyNode;
+        //每次比较后两个结点值是否相同
+        while(cur.next != null && cur.next.next != null) {
+            if(cur.next.val != cur.next.next.val) {//值不相同
+                cur = cur.next;
+            }else {//值相同，保存cur.next的值，跳过所有相同值的结点
+                int temp = cur.next.val;//本题的temp设计的比较巧妙
+                while(cur.next != null && cur.next.val == temp) {//本题关键
+                    cur.next = cur.next.next;
+                }
+            }
+        }
+        return dummyNode.next;//返回首元节点
+    }
+}
+
+```
+
+方法2：暴力求解、哈希表
+
+> 1.遍历链表，用哈希表记录每个结点出现的次数；
+>
+> 2.增加头结点，遍历该链表，对于每个结点检查哈希表中的计数，只留下计数为1的，其他情况都删除；
+>
+> 3.返回首元结点。
+>
+> 这个方法的好处是原链表不需要有序，坏处是借助了o(n)的空间。
+
+```java
+/*
+ public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+*/
+import java.util.*;
+public class Solution {
+    public ListNode deleteDuplication(ListNode pHead) {
+        //特例
+        if(pHead == null || pHead.next == null) {
+            return pHead;
+        }
+        //哈希表
+        HashMap<Integer, Integer> map = new HashMap<>();
+        //工作指针
+        ListNode cur = pHead;
+        //遍历链表，统计结点出现的次数
+        while(cur != null) {
+            if(map.containsKey(cur.val)) {
+                map.put(cur.val, map.get(cur.val) + 1);
+            }else {
+                map.put(cur.val, 1);
+            }
+            cur = cur.next;
+        }
+        //再次遍历链表
+        //头结点：因为涉及到删除单链表
+        ListNode dummyNode = new ListNode(-1);
+        dummyNode.next = pHead;
+        cur = dummyNode;
+        while(cur.next != null) {
+            if(map.get(cur.next.val) != 1) {
+                cur.next = cur.next.next;
+            }else {
+                cur = cur.next;
+            }
+        }
+        return dummyNode.next;//返回首元节点
+    }
+}
+
+```
+
+#### 删除链表的结点
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/074232413F62F32D1B2134AF0B9ED494)
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ *   public ListNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param head ListNode类 
+     * @param val int整型 
+     * @return ListNode类
+     */
+    public ListNode deleteNode (ListNode head, int val) {
+        // write code here
+        //特例
+        if(head == null) {
+            return null;
+        }
+        //头结点
+        ListNode dummyNode = new ListNode(-1);
+        dummyNode.next = head;
+        ListNode pre = dummyNode;
+        ListNode cur = head;
+        //遍历链表
+        while(cur != null) {
+            if(cur.val == val) {
+                pre.next = cur.next;
+                pre = cur;
+                cur = cur.next;
+            }else {
+                pre = cur;
+                cur = cur.next;
+            }
+        }
+        return dummyNode.next;
+    }
+}
+```
+
