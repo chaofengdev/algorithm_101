@@ -621,9 +621,222 @@ public class Solution {
 }
 ```
 
-#### 复杂链表的复制
+#### 复杂链表的复制 *
 
-#### 删除链表中的重复结点
+方法1：利用哈希表
+
+> java中的HashMap是重要的知识点，需要掌握。详细可见菜鸟教程https://www.runoob.com/java/java-hashmap.html
+>
+> 还有就是掌握常见遍历HashMap的方式，详细可见https://cloud.tencent.com/developer/article/1751974
+
+> - step 1：建立哈希表，key为原始链表的节点，value为拷贝链表的节点。
+> - step 2：遍历原始链表，依次拷贝每个节点，并连接指向后一个的指针，同时将原始链表节点与拷贝链表节点之间的映射关系加入哈希表。
+> - step 3：遍历哈希表，对于每个映射，拷贝节点的ramdom指针就指向哈希表中原始链表的random指针。
+
+```java
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+import java.util.*;
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead) {
+        //哈希表
+        HashMap<RandomListNode, RandomListNode> map = new HashMap<>();//哈希表，保存原链表结点与复制后的结点对
+        //头结点
+        RandomListNode dummyNode = new RandomListNode(-1);
+        dummyNode.next = pHead;
+        //工作指针
+        RandomListNode cur = pHead;//指向原结点
+        RandomListNode pre = dummyNode;//指向复制后结点（这里要理解清楚）
+        //遍历链表：复制结点，新建单链表
+        while(cur != null) {//这里只考虑单链表的情况
+            RandomListNode clone = new RandomListNode(cur.label);//新建结点
+            map.put(cur, clone);//放入哈希表
+            pre.next = clone;
+            pre = pre.next;//指针后移
+            cur = cur.next;//指针后移
+        }
+        //遍历哈希表：本题难点所在，务必思考清楚
+        for(HashMap.Entry<RandomListNode, RandomListNode> entry : map.entrySet()) {//遍历哈希表的方式之一
+            if(entry.getKey().random == null) {//该结点random为null
+                entry.getValue().random = null;
+            }else {//该节点random不为null
+                entry.getValue().random = map.get(entry.getKey().random);//这里主要是考虑清楚哈希表的映射关系
+            }
+        }
+        return dummyNode.next;
+    }
+}
+
+```
+
+> 上面采用遍历哈希表的方式，实际操作完全不需要那么麻烦，可以将整个过程拆分为，
+>
+> 遍历原链表，保存结点映射对；
+>
+> 遍历原链表，构建新链表。
+>
+> 我觉得k神讲的比较通透：https://leetcode.cn/problems/fu-za-lian-biao-de-fu-zhi-lcof/solution/jian-zhi-offer-35-fu-za-lian-biao-de-fu-zhi-ha-xi-/
+
+```java
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+import java.util.*;
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead) {
+        HashMap<RandomListNode, RandomListNode> map = new HashMap<>();
+        RandomListNode cur = pHead;
+        //遍历原链表，保存结点映射对
+        while(cur != null) {
+            RandomListNode node = new RandomListNode(cur.label);
+            map.put(cur, node);
+            cur = cur.next;
+        }
+        //再次遍历原链表，构建新链表
+        cur = pHead;
+        while(cur != null) {
+            map.get(cur).next = map.get(cur.next);
+            map.get(cur).random = map.get(cur.random);
+            cur = cur.next;
+        }
+        return map.get(pHead);
+    }
+}
+```
+
+方法2：双指针
+
+这题双指针，没做过的基本不可能想到。确实比较精彩。
+
+> - step 1：遍历链表，对每个节点新建一个拷贝节点，并插入到该节点之后。
+> - step 2：使用双指针再次遍历链表，两个指针每次都移动两步，一个指针遍历原始节点，一个指针遍历拷贝节点，拷贝节点的随机指针跟随原始节点，指向原始节点随机指针的下一位。--这里完全可以使用一个指针即可。
+> - step 3：再次使用双指针遍历链表，每次越过后一位相连，即拆分成两个链表。--这里使用两个指针，同时需要保存新链表的首元结点。
+
+![img](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/1604747742-aMDdkM-Picture14.png)
+
+```java
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead) {
+        if(pHead == null) return null;
+        //遍历链表，复制结点
+        RandomListNode cur = pHead;
+        while(cur != null) {
+            RandomListNode temp = new RandomListNode(cur.label);//新建结点
+            temp.next = cur.next;
+            cur.next = temp;
+            cur = temp.next;
+        }
+        //构建新链表结点的random指向
+        cur = pHead;
+        while(cur != null) {
+            if(cur.random == null) {
+                cur.next.random = null;
+            }else {
+                cur.next.random = cur.random.next;//设计该结构的核心原因，通过该方法少使用一个哈希表
+            }
+            cur = cur.next.next;//下一个原结点
+        }
+        //拆分两个链表
+        RandomListNode res = pHead.next;//保存结果
+        RandomListNode cur1 = pHead;//原链表
+        RandomListNode cur2 = pHead.next;//复制后链表
+        while(cur2.next != null) {//这个条件不太好想到，当然也有其他写法
+            cur1.next = cur1.next.next;
+            cur1 = cur1.next;
+            cur2.next = cur2.next.next;
+            cur2 = cur2.next;
+        }
+        cur1.next = null;//同样，这里需要单独处理
+        return res;
+    }
+}
+
+```
+
+显然，看透了拆分两个链表的逻辑后，可以更优雅的改成下面的代码：
+
+```java
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead) {
+        if(pHead == null) return null;
+        //遍历链表，复制结点
+        RandomListNode cur = pHead;
+        while(cur != null) {
+            RandomListNode temp = new RandomListNode(cur.label);//新建结点
+            temp.next = cur.next;
+            cur.next = temp;
+            cur = temp.next;
+        }
+        //构建新链表结点的random指向
+        cur = pHead;
+        while(cur != null) {
+            if(cur.random == null) {
+                cur.next.random = null;
+            }else {
+                cur.next.random = cur.random.next;//设计该结构的核心原因，通过该方法少使用一个哈希表
+            }
+            cur = cur.next.next;//下一个原结点
+        }
+        //拆分两个链表
+        RandomListNode res = pHead.next;//保存结果
+        RandomListNode cur1 = pHead;//原链表
+        RandomListNode cur2 = pHead.next;//复制后链表
+        while(cur1 != null) {//cur1.next不会等于null
+            cur1.next = cur1.next.next;
+            cur1 = cur1.next;
+            if(cur2.next != null) {//排除了cur2.next == null的情况
+                cur2.next = cur2.next.next;
+            }
+            cur2 = cur2.next;//就不需要对cur1或者cur2单独处理了，比较优雅的写法
+        }
+        return res;
+    }
+}
+
+```
+
+
+
+#### 删除链表中的重复结点 *
 
 方法1：直接比较删除
 
@@ -782,6 +995,48 @@ public class Solution {
             }else {
                 pre = cur;
                 cur = cur.next;
+            }
+        }
+        return dummyNode.next;
+    }
+}
+```
+
+虽然上面的编码规范良好，但完全可以只使用一个指针pre。
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ *   public ListNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param head ListNode类 
+     * @param val int整型 
+     * @return ListNode类
+     */
+    public ListNode deleteNode (ListNode head, int val) {
+        // write code here
+        //头结点
+        ListNode dummyNode = new ListNode(-1);
+        dummyNode.next = head;
+        ListNode pre = dummyNode;
+        while(pre.next != null) {
+            if(pre.next.val == val) {
+                pre.next = pre.next.next;
+            }else {
+                pre = pre.next;
             }
         }
         return dummyNode.next;
