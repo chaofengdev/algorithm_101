@@ -1077,7 +1077,7 @@ public class Solution {
         while(fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next;
-            if(fast.next != null) {
+            if(fast.next != null) {//这种写法也比较巧妙
                 fast = fast.next;
             }
         }
@@ -1114,3 +1114,141 @@ public class Solution {
 }
 ```
 
+####  NC96 回文链表
+
+![image-20230309170855489](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230309170855489.png)
+
+> - step 1：慢指针每次走一个节点，快指针每次走两个节点，快指针到达链表尾的时候，慢指针刚好到了链表中点。
+> - step 2：从中点的位置，开始往后将后半段链表反转。
+> - step 3：按照方法三的思路，左右双指针，左指针从链表头往后遍历，右指针从链表尾往反转后的前遍历，依次比较遇到的值。
+
+这题的难点在于，如何恰当分割链表，实际上链表不需要真的断开，比如下面的解答就通过不断开链表，实现简化代码书写。
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param head ListNode类 the head
+     * @return bool布尔型
+     */
+    public boolean isPail (ListNode head) {
+        // write code here
+        //截断链表
+        ListNode fast = head;
+        ListNode slow = head;
+        while(fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        //反转链表
+        slow = reversion(slow);
+        fast = head;
+        //比较两个链表是否相同
+        return isSame(slow, fast);
+    }
+    //比较两个链表是否相同
+    public boolean isSame(ListNode head1, ListNode head2) {
+        while(head1 != null && head2 != null) {
+            if(head1.val != head2.val) {
+                return false;
+            }
+            head1 = head1.next;
+            head2 = head2.next;
+        }
+        return true;//不需要考虑长度问题
+    }
+    //反转链表
+    public ListNode reversion(ListNode head) {
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode temp = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = temp;
+        }
+        return pre;
+    }
+}
+```
+
+更严谨的写法如下：
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param head ListNode类 the head
+     * @return bool布尔型
+     */
+    public boolean isPail (ListNode head) {
+        // write code here
+        if(head == null || head.next == null) return true;
+        //截断链表
+        ListNode fast = head.next;
+        ListNode slow = head;
+        while(fast.next != null && fast.next.next != null) {//这样slow指向奇数链表***第一个或者偶数链表****的第二个。
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode head2 = slow.next;
+        if(fast.next != null) {//表示奇数链表
+            head2 = slow.next.next;
+        }
+        slow.next = null;//断开连接
+        //反转链表
+        head2 = reversion(head2);
+        //比较两个链表是否相同
+        return isSame(head, head2);
+    }
+    //比较两个链表是否相同
+    public boolean isSame(ListNode head1, ListNode head2) {
+        while(head1 != null && head2 != null) {
+            if(head1.val != head2.val) {
+                return false;
+            }
+            head1 = head1.next;
+            head2 = head2.next;
+        }
+        return true;//不需要考虑长度问题
+    }
+    //反转链表
+    public ListNode reversion(ListNode head) {
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode temp = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = temp;
+        }
+        return pre;
+    }
+}
+```
+
+上面两种写法的差异是，slow指针遍历到哪里停止，如果while循环的条件是`fast != null && fast.next != null`则slow会停留在奇数的中点，偶数的中点偏右。
+
+![image-20230309172533323](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230309172533323.png)
+
+如果按照第二种写法，则slow指针会停留在左边。体会一下两者的差异，后面可以直接断开链表，前面则不行。当然前面完全可以多用一个pre指针，达到同样的效果。
+
+![image-20230309172818332](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230309172818332.png)
