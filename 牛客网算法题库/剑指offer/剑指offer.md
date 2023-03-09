@@ -1044,3 +1044,73 @@ public class Solution {
 }
 ```
 
+
+
+#### NC2 重排链表
+
+方法1：截断链表+反转链表+合并链表
+
+> 1.将链表分为前后两段；
+>
+> 2.将后半段链表反转；
+>
+> 3.从前半段链表和后半段链表的首元结点开始，逐个合并形成新链表。
+
+```java
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public void reorderList(ListNode head) {
+        if(head == null) return;
+        //截断链表
+        ListNode fast = head;
+        ListNode slow = head;
+        while(fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next;
+            if(fast.next != null) {
+                fast = fast.next;
+            }
+        }
+        ListNode temp = slow.next;//保存后段链表的首元结点
+        slow.next = null;//截断链表
+        //反转链表
+        ListNode head2 = reversion(temp);
+        //连接两个链表成为新链表
+        //ListNode dummyNode = new ListNode(-1);
+        //dummyNode.next = head;
+        ListNode cur1 = head;
+        ListNode cur2 = head2;
+        while(cur1 != null && cur2 != null) {//两个工作指针均不为空
+            ListNode node1 = cur1.next;
+            ListNode node2 = cur2.next;
+            cur1.next = cur2;
+            cur1 = node1;
+            cur2.next = node1;
+            cur2 = node2;
+        }
+    }
+    //反转链表
+    public ListNode reversion(ListNode head) {
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode temp = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = temp;
+        }
+        return pre;//返回反转后链表的首元结点
+    }
+}
+```
+
