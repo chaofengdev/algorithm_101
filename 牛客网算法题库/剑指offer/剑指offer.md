@@ -1252,3 +1252,243 @@ public class Solution {
 如果按照第二种写法，则slow指针会停留在左边。体会一下两者的差异，后面可以直接断开链表，前面则不行。当然前面完全可以多用一个pre指针，达到同样的效果。
 
 ![image-20230309172818332](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230309172818332.png)
+
+
+
+## 二叉树
+
+#### 二叉树的深度
+
+方法1：递归
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/912E54FDA2FC2312AE3F1E8387E0C1B6)
+
+> 二叉树的深度就等于根节点这个1层加上左子树和右子树深度的最大值。
+>
+> - **终止条件：** 当进入叶子节点后，再进入子节点，即为空，没有深度可言，返回0.
+> - **返回值：** 每一级按照上述公式，返回两边子树深度的最大值加上本级的深度，即加1.
+> - **本级任务：** 每一级的任务就是进入左右子树，求左右子树的深度。
+
+```
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    public int TreeDepth(TreeNode root) {
+        //终止条件
+        if(root == null) {
+            return 0;
+        }
+        //本级任务：树的深度等于左子树或者右子树深度的最大值加一
+        int depth1 = TreeDepth(root.left);
+        int depth2 = TreeDepth(root.right);
+        int depth = Math.max(depth1, depth2) + 1;
+        //返回值
+        return depth;
+    }
+}
+```
+
+稍微整理一下：
+
+```java
+public class Solution {
+    public int TreeDepth(TreeNode root) {
+        if(root == null) {
+            return 0;
+        }
+        return Math.max(TreeDepth(root.left), TreeDepth(root.right)) + 1;
+    }
+}
+```
+
+方法2：层次遍历bfs
+
+> 经典算法，没什么好说的。需要注意，队列的使用。
+>
+> `Queue<TreeNode> queue = new LinkedList<>();`
+>
+> queue.isEmpty() 判空
+>
+> queue.offer(node) 结点入队
+>
+> queue.poll() 结点出队
+>
+> queue.size() 队列内元素大小
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/3B5A6883A44EDAD8E2563E74BB4C2846)
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    public int TreeDepth(TreeNode root) {
+        //特例：空节点没有深度
+        if(root == null) return 0;
+        //队列：维护层次结点
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int depth = 0;
+        while(!queue.isEmpty()) {
+            int len = queue.size();//每层的结点数
+            for(int i = 0; i < len; i++) {//一次遍历一层的结点
+                TreeNode node = queue.poll();//遍历的是该层结点
+                if(node.left != null) queue.offer(node.left); 
+                if(node.right != null) queue.offer(node.right);
+            }
+            depth++;//遍历一层，深度加一
+        }
+        return depth;
+    }
+}
+
+```
+
+#### 按之字形顺序打印二叉树
+
+> 题目本身很简单，需要注意的是：
+>
+> 1.Collections.reverse(list) 没有返回值；
+>
+> 2.注意temp集合的新建时机，是每层新建一个；
+>
+> 3.也可以使用boolean flag来判断是否要逆转该层。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/387D7FA985B64AFE794DE2D1DD4E00D4)
+
+```java
+import java.util.*;
+
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    public ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        TreeNode root = pRoot;
+        //特例
+        if(root == null) return null;
+        //结果集合
+        ArrayList<ArrayList<Integer>> res = new ArrayList<ArrayList<Integer>>();
+        //队列
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        //层次计数器
+        int depth = 0;
+        while(!queue.isEmpty()) {
+            int n = queue.size();
+            ArrayList<Integer> temp = new ArrayList<>();//这个每层都新建，所以不需要重置
+            for(int i = 0; i < n; i++) {
+                TreeNode node = queue.poll();
+                temp.add(node.val);
+                if(node.left != null) queue.offer(node.left);
+                if(node.right != null) queue.offer(node.right);
+            }
+            depth++;
+            // if(depth % 2 != 0) {//奇数层正序，偶数层逆序
+            //     res.add(temp);
+            // }else {
+            //     Collections.reverse(temp);//注意该工具方法无返回值
+            //     res.add(temp);
+            // }
+            if(depth % 2 == 0) {//偶数层逆序，奇数层不变即可
+                Collections.reverse(temp);
+            }
+            res.add(temp);      
+        }
+        return res;
+    }
+
+}
+```
+
+官方给出了一个非常精彩的双栈解答。这里直接贴答案。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/4001D0A4E11E0FA0428C08B35F9ABAB8)
+
+```java
+import java.util.*;
+public class Solution {
+    public ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        TreeNode head = pRoot;
+        ArrayList<ArrayList<Integer> > res = new ArrayList<ArrayList<Integer>>();
+        if(head == null)
+            //如果是空，则直接返回空list
+            return res; 
+        Stack<TreeNode> s1 = new Stack<TreeNode>();
+        Stack<TreeNode> s2 = new Stack<TreeNode>();
+        //放入第一次
+        s1.push(head); 
+        while(!s1.isEmpty() || !s2.isEmpty()){ 
+            ArrayList<Integer> temp = new ArrayList<Integer>();
+            //遍历奇数层
+            while(!s1.isEmpty()){ 
+                TreeNode node = s1.pop();
+                //记录奇数层
+                temp.add(node.val); 
+                //奇数层的子节点加入偶数层
+                if(node.left != null)  
+                    s2.push(node.left);
+                if(node.right != null) 
+                    s2.push(node.right);
+            }
+            //数组不为空才添加
+            if(temp.size() != 0)  
+                res.add(new ArrayList<Integer>(temp));
+            //清空本层数据
+            temp.clear(); 
+            //遍历偶数层
+            while(!s2.isEmpty()){ 
+                TreeNode node = s2.pop();
+                //记录偶数层
+                temp.add(node.val);  
+                //偶数层的子节点加入奇数层
+                if(node.right != null)  
+                    s1.push(node.right);
+                if(node.left != null) 
+                    s1.push(node.left);
+            }
+            //数组不为空才添加
+            if(temp.size() != 0) 
+                res.add(new ArrayList<Integer>(temp));
+            //清空本层数据
+            temp.clear(); 
+        }
+        return res;
+    }
+
+}
+
+```
+
