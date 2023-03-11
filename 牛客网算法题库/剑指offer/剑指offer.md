@@ -1492,3 +1492,62 @@ public class Solution {
 
 ```
 
+
+
+#### 二叉搜索树的第k个结点
+
+方法1：中序遍历（递归）
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param proot TreeNode类 
+     * @param k int整型 
+     * @return int整型
+     */
+    private int count;//记录遍历到第几个结点
+    private TreeNode res;//记录第k个结点
+    public int KthNode (TreeNode proot, int k) {
+        // write code here
+        dfs(proot, k);
+        if(res != null) {
+            return res.val;
+        }
+        return -1;
+    }
+    //中序遍历
+    public void dfs(TreeNode root, int k) {
+        //递归出口
+        if(root == null) return;//if(root == null || count > k) return; 可以提高一点效率
+        //左子树
+        dfs(root.left, k);
+        count++;
+        if(count == k) res = root;//记录第k个结点
+        //右子树
+        dfs(root.right,k);
+    }
+}
+```
+
+方法2：中序遍历（非递归）
+
+```java
+
+```
+
