@@ -1498,6 +1498,13 @@ public class Solution {
 
 方法1：中序遍历（递归）
 
+> - step 1：设置全局变量count记录遍历了多少个节点，res记录第k个节点。
+> - step 2：另写一函数进行递归中序遍历，当节点为空或者超过k时，结束递归，返回。
+> - step 3：优先访问左子树，再访问根节点，访问时统计数字，等于k则找到。
+> - step 4：最后访问右子树。
+
+![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/AD840828372A5B112A2F2C26B88D4243)
+
 ```java
 import java.util.*;
 
@@ -1547,7 +1554,55 @@ public class Solution {
 
 方法2：中序遍历（非递归）
 
-```java
+> - step 1：用栈记录当前节点，不断往左深入，直到左边子树为空。
+> - step 2：再弹出栈顶（即为当前子树的父节点），访问该节点，同时计数。
+> - step 3：然后再访问其右子树，其中每棵子树都遵循左中右的次序。
+> - step 4：直到第k个节点返回，如果遍历结束也没找到，则返回-1.
 
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param proot TreeNode类 
+     * @param k int整型 
+     * @return int整型
+     */
+    public int KthNode (TreeNode proot, int k) {
+        // write code here
+        TreeNode root = proot;
+        //特例
+        if(root == null) return -1;//空树返回-1
+        //计数器
+        int count = 0;
+        //栈
+        Stack<TreeNode> stack = new Stack<>();
+        while(!stack.isEmpty() || root != null) {//循环条件特殊
+            while(root != null) {//每颗子树从最左开始
+                stack.push(root);
+                root = root.left;
+            }
+            TreeNode node = stack.pop();
+            count++;
+            if(count == k) return node.val;//找到第k个结点，返回node.val
+            root = node.right;
+        }
+        return -1;//没有找到，返回-1
+    }
+}
 ```
 
