@@ -1606,3 +1606,259 @@ public class Solution {
 }
 ```
 
+
+
+#### 重建二叉树
+
+方法1：递归
+
+> - step 1：先根据前序遍历第一个点建立根节点。
+> - step 2：然后遍历中序遍历找到根节点在数组中的位置。
+> - step 3：再按照子树的节点数将两个遍历的序列分割成子数组，将子数组送入函数建立子树。
+> - step 4：直到子树的序列长度为0，结束递归。
+
+![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/2939E21521C22C46A95A8B8DFA62CE0D)
+
+```java
+import java.util.*;
+/**
+ * Definition for binary tree
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode reConstructBinaryTree(int [] pre,int [] vin) {
+        //递归出口
+        if(pre.length == 0 || vin.length == 0) {
+            return null;
+        }
+        //新建根节点
+        TreeNode root = new TreeNode(pre[0]);
+        //遍历中序序列，找到第一个根节点，左右分别递归处理
+        for(int i = 0; i < vin.length; i++) {
+            if(vin[i] == pre[0]) {
+                //构建左子树
+                root.left = 
+                reConstructBinaryTree(Arrays.copyOfRange(pre, 1, i + 1), Arrays.copyOfRange(vin, 0, i));
+                //构建右子树
+                root.right = 
+                reConstructBinaryTree(Arrays.copyOfRange(pre, i + 1, pre.length), Arrays.copyOfRange(vin, i + 1, vin.length));
+                break;
+            }
+        }
+        //返回根结点
+        return root;
+    }
+}
+```
+
+方法2：非递归
+
+> 没看懂，放个链接后面再看吧。
+>
+> https://www.nowcoder.com/practice/8a19cbe657394eeaac2f6ea9b0f6fcf6?tpId=13&tqId=23282&ru=%2Fpractice%2F57aa0bab91884a10b5136ca2c087f8ff&qru=%2Fta%2Fcoding-interviews%2Fquestion-ranking&sourceUrl=%2Fexam%2Foj%2Fta%3Fpage%3D1%26tpId%3D13%26type%3D13
+
+
+
+#### 树的子结构
+
+方法1：递归 两层前序遍历
+
+本题递归并不是很好想，有点饶。仔细体会思考。
+
+参考链接：https://leetcode.cn/problems/shu-de-zi-jie-gou-lcof/solution/mian-shi-ti-26-shu-de-zi-jie-gou-xian-xu-bian-li-p/
+
+牛客官方解答应该有误。
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        if(root1 == null || root2 == null) return false;//空树不是任意树的子结构
+        boolean flag1 = recursion(root1, root2);//同一根结点
+        boolean flag2 = HasSubtree(root1.left, root2);//左子树
+        boolean flag3 = HasSubtree(root1.right, root2);//右子树
+        return flag1 || flag2 || flag3;//本质上是先序遍历
+    }
+    //规定B与A同一个根节点前提下，B是否是A的子结构
+    public boolean recursion(TreeNode root1, TreeNode root2) {
+        if(root2 == null) return true;//注意：这里返回true，是退出条件
+        if(root1 == null || root1.val != root2.val) return false;
+        return recursion(root1.left, root2.left) && recursion(root1.right, root2.right);//左右子树结点值要全部相等
+    }
+}
+```
+
+换一种写法，本质相同。
+
+本质上这题有个基础题，即确定root1.val == root2.val的前提下，如何判断B是A的子结构，就是compare方法的功能。
+
+那么回到本题，如何在A中找到B的根节点吗，递归的先序遍历即可，如果找到了，就返回true，如果没有找到，就去左子树或者右子树中找。
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        if(root2 == null) return false;//特例
+        return find(root1, root2);
+    }
+    //B是否为A的子结构，可以分为两步，
+    //从A中找到B的根节点
+    //在上面的前提下，B的结点是否都在A中
+    public boolean find(TreeNode root1, TreeNode root2) {
+        if(root1 == null) return false;//A中没有B的根节点
+        if(root2 == null) return false;//B为空肯定不存在A中
+        if(root1.val == root2.val && compare(root1, root2)) {//节点值相同的前提下，并且B是A的子结构
+            return true;
+        }
+        return find(root1.left, root2) || find(root1.right, root2);//左子树和右子树中寻找B的根节点，左右子树中找到一个即可
+    }
+    //严格定义：判断B的结点是否都在A上
+    public boolean compare(TreeNode root1, TreeNode root2) {
+        if(root2 == null) return true;//B没有结点，则返回true
+        if(root1 == null || root1.val != root2.val) return false;//A没有结点，则返回false
+        return compare(root1.left, root2.left) && compare(root1.right, root2.right);
+    }
+}
+```
+
+方法2：层序遍历 两层层序遍历
+
+> 根据方法一，所以这道题的思路，无非就是在A树中遍历每个节点尝试找到那个子树，然后每次以该节点出发能不能将子树与B树完全匹配。能用前序遍历解决，我们也可以用层次遍历来解决。
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        //特例
+        if(root2 == null || root1 == null) return false;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root1);
+        while(!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if(node.val == root2.val && helper(node, root2)) {//关键
+                return true;
+            }
+            if(node.left != null) queue.offer(node.left);
+            if(node.right != null) queue.offer(node.right);
+        }
+        return false;
+    }
+    public boolean helper(TreeNode root1, TreeNode root2) {
+        Queue<TreeNode> queue1 = new LinkedList<>();
+        Queue<TreeNode> queue2 = new LinkedList<>();
+        queue1.offer(root1);
+        queue2.offer(root2);
+        while(!queue2.isEmpty()) {
+            TreeNode node1 = queue1.poll();
+            TreeNode node2 = queue2.poll();
+            if(node1 == null || node1.val != node2.val) return false;//关键
+            //A可以添加空结点，B不添加空结点
+            //每次判断A是否为空结点，如果是空结点，则直接返回false
+            //这里不是很好理解，可以细细揣摩
+            if(node2.left != null) {
+                queue2.offer(node2.left);
+                queue1.offer(node1.left);
+            }
+            if(node2.right != null) {
+                queue2.offer(node2.right);
+                queue1.offer(node1.right);
+            }
+        }
+        return true;
+    }
+}
+
+```
+
+#### 二叉树的镜像
+
+方法1：层序遍历
+
+层序遍历的同时交换左右子结点。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param pRoot TreeNode类 
+     * @return TreeNode类
+     */
+    public TreeNode Mirror (TreeNode pRoot) {
+        // write code here
+        TreeNode root = pRoot;
+        if(root == null) return null;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while(!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            //交换
+            TreeNode temp = node.left;
+            node.left = node.right;
+            node.right = temp;
+            if(node.left != null) {
+                queue.offer(node.left);
+            }
+            if(node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+        return root;
+    }
+}
+```
+
