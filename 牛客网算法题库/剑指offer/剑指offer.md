@@ -1862,3 +1862,228 @@ public class Solution {
 }
 ```
 
+方法2：后序遍历
+
+> 因为我们需要将二叉树镜像，意味着每个左右子树都会交换位置，如果我们从上到下对遍历到的节点交换位置，但是它们后面的节点无法跟着他们一起被交换，因此我们可以考虑自底向上对每两个相对位置的节点交换位置，这样往上各个子树也会被交换位置。
+>
+> 自底向上的遍历方式，我们可以采用后序递归的方法。
+>
+> - step 1：先深度最左端的节点，遇到空树返回，处理最左端的两个子节点交换位置。
+> - step 2：然后进入右子树，继续按照先左后右再回中的方式访问。
+> - step 3：再返回到父问题，交换父问题两个子节点的值。
+>
+> 有一说一，代码异常简洁，非常简单的一道题。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param pRoot TreeNode类 
+     * @return TreeNode类
+     */
+    public TreeNode Mirror (TreeNode pRoot) {
+        // write code here
+        TreeNode root = pRoot;
+        if(root == null) {
+            return null;
+        }
+        TreeNode left = Mirror(root.left);
+        TreeNode right = Mirror(root.right);
+        root.left = right;
+        root.right = left;
+        return root;
+    }
+}
+```
+
+#### 从上往下打印二叉树
+
+方法1：层序遍历
+
+```java
+import java.util.ArrayList;
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    public ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        ArrayList<Integer> res = new ArrayList();
+        if(root == null)
+            //如果是空，则直接返回空数组
+            return res; 
+        //队列存储，进行层次遍历
+        Queue<TreeNode> q = new ArrayDeque<TreeNode>(); 
+        q.offer(root);
+        while(!q.isEmpty()){
+            TreeNode cur = q.poll();
+            res.add(cur.val);
+            //若是左右孩子存在，则存入左右孩子作为下一个层次
+            if(cur.left != null)
+                q.add(cur.left);
+            if(cur.right != null)
+                q.add(cur.right);
+        }
+        return res;
+    }
+}
+
+
+```
+
+方法2：递归形式的层序遍历 
+
+> 有点诡异，纯当了解了。
+>
+> - step 1：首先判断二叉树是否为空，空树没有遍历结果。
+> - step 2：使用递归进行层次遍历输出，每次递归记录当前二叉树的深度，每当遍历到一个节点，如果为空直接返回。
+> - step 3：如果遍历的节点不为空，输出二维数组中一维数组的个数（即代表了输出的行数）小于深度，说明这个节点应该是新的一层，我们在二维数组中增加一个一维数组，然后再加入二叉树元素。
+> - step 4：如果不是step 3的情况说明这个深度我们已经有了数组，直接根据深度作为下标取出数组，将元素加在最后就可以了。
+> - step 5：处理完这个节点，再依次递归进入左右节点，同时深度增加。因为我们进入递归的时候是先左后右，那么遍历的时候也是先左后右，正好是层次遍历的顺序。
+> - step 6：最后将二维数组中的结果依次送入一维数组。
+
+```java
+import java.util.*;
+public class Solution {
+    void traverse(TreeNode root, ArrayList<ArrayList<Integer> > res, int depth) {
+        if(root != null){
+            //新的一层
+            if(res.size() < depth){  
+                ArrayList<Integer> row = new ArrayList(); 
+                res.add(row);
+                row.add(root.val);
+            //读取该层的一维数组，将元素加入末尾
+            }else{ 
+                ArrayList<Integer> row = res.get(depth - 1);
+                row.add(root.val);
+            }
+        }
+        else
+            return;
+        //递归左右时深度记得加1
+        traverse(root.left, res, depth + 1); 
+        traverse(root.right, res, depth + 1);
+    }
+    public ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        ArrayList<Integer> res = new ArrayList();
+        ArrayList<ArrayList<Integer> > temp = new ArrayList<ArrayList<Integer> >();
+        if(root == null)
+            //如果是空，则直接返回
+            return res; 
+        //递归层次遍历 
+        traverse(root, temp, 1); 
+        //送入一维数组
+        for(int i = 0; i < temp.size(); i++)
+            for(int j = 0; j < temp.get(i).size(); j++)
+                res.add(temp.get(i).get(j));
+        return res;
+    }
+}
+
+```
+
+
+
+#### 二叉搜索树的后序遍历序列
+
+这题还是有一定难度的。
+
+方法1：递归
+
+![img](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/e8f9f419e91b180c7c299897358d884a274a1500ba07489785c6f8382413c49f-Picture9.png)
+
+```java
+public class Solution {
+    public boolean VerifySquenceOfBST(int [] sequence) {
+        int len = sequence.length;
+        if(len == 0) return false;
+        return dfs(sequence, 0, len - 1);//[0,len-1]
+    }
+    //判断数组arr在区间[left,right]上是否是二叉搜索树的后序遍历序列
+    public boolean dfs(int[] arr, int left, int right) {
+        //递归出口：只剩一个结点
+        if(left >= right) return true;
+        //int root = arr[right]; 
+        //遍历数组，找到第一个大于arr[right]的值及下标
+        int index = left;
+        while(arr[index] < arr[right]) {//这里使用for循环，需要多考虑多种临界情况
+            index++;
+        }
+        int mid = index;//右子树的第一个结点
+        //判断右子树是否合法
+        while(index < right) {
+            if(arr[index] < arr[right]) {
+                return false;
+            }
+            index++;
+        }
+        //两个子区间内部的情况需要继续递归判断
+        return dfs(arr, left, mid - 1) && dfs(arr, mid, right - 1);
+    }
+}
+```
+
+思考这种写法为什么不对，应该如何改进：
+
+```java
+public class Solution {
+    public boolean VerifySquenceOfBST(int [] sequence) {
+        int len = sequence.length;
+        if(len == 0) return false;
+        return dfs(sequence, 0, len - 1);//[0,len-1]
+    }
+    //判断数组arr在区间[left,right]上是否是二叉搜索树的后序遍历序列
+    public boolean dfs(int[] arr, int left, int right) {
+        //递归出口
+        if(left >= right) return true;
+        int root = arr[right]; 
+        //遍历数组，找到第一个大于arr[right]的值及下标
+        int mid = 0;
+        for(int i = left; i < right; i++) {
+            if(arr[i] > arr[right]) {
+                mid = i;//右子树的第一个结点下标
+                break;
+            }
+        }
+        //判断右子树是否合法
+        for(int i = mid; i < right; i++) {
+            if(arr[i] < arr[right]) {
+                return false;
+            }
+        }
+        return dfs(arr, left, mid - 1) && dfs(arr, mid, right - 1);
+    }
+}
+```
+
+方法2：单调栈（推荐方法）
+
+```java
+
+```
+
