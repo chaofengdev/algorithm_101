@@ -2034,7 +2034,7 @@ public class Solution {
         while(arr[index] < arr[right]) {//这里使用for循环，需要多考虑多种临界情况
             index++;
         }
-        int mid = index;//右子树的第一个结点
+        int mid = index;//右子树的第一个结点或者根结点
         //判断右子树是否合法
         while(index < right) {
             if(arr[index] < arr[right]) {
@@ -2063,7 +2063,7 @@ public class Solution {
         if(left >= right) return true;
         int root = arr[right]; 
         //遍历数组，找到第一个大于arr[right]的值及下标
-        int mid = 0;
+        int mid = left;
         for(int i = left; i < right; i++) {
             if(arr[i] > arr[right]) {
                 mid = i;//右子树的第一个结点下标
@@ -2081,9 +2081,111 @@ public class Solution {
 }
 ```
 
+改进：
+
+```java
+public class Solution {
+    public boolean VerifySquenceOfBST(int [] sequence) {
+        int len = sequence.length;
+        if(len == 0) return false;
+        return dfs(sequence, 0, len - 1);//[0,len-1]
+    }
+    //判断数组arr在区间[left,right]上是否是二叉搜索树的后序遍历序列
+    public boolean dfs(int[] arr, int left, int right) {
+        //递归出口
+        if(left >= right) return true;//[4,6,7,5]
+        int root = arr[right]; 
+        //遍历数组，找到第一个大于arr[right]的值及下标
+        int mid = left;
+        for(int i = left; i <= right; i++) {
+            if(arr[i] >= arr[right]) {//这里必须要大于等于，[6,7]时，mid必须指向7
+                mid = i;//右子树的第一个结点下标或者根节点下标
+                break;
+            }
+        }
+        //判断右子树是否合法
+        for(int i = mid; i < right; i++) {
+            if(arr[i] < arr[right]) {
+                return false;
+            }
+        }
+        return dfs(arr, left, mid - 1) && dfs(arr, mid, right - 1);
+    }
+}
+```
+
 方法2：单调栈（推荐方法）
 
 ```java
+...
+```
 
+#### 二叉树中和为某一值的路径
+
+方法1：递归
+
+> - step 1：每次检查遍历到的节点是否为空节点，空节点就没有路径。
+> - step 2：再检查遍历到是否为叶子节点，且当前sum值等于节点值，说明可以刚好找到。
+> - step 3：检查左右子节点是否可以有完成路径的，如果任意一条路径可以都返回true，因此这里选用两个子节点递归的或。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param root TreeNode类 
+     * @param sum int整型 
+     * @return bool布尔型
+     */
+    public boolean hasPathSum (TreeNode root, int sum) {
+        // write code here
+        if(root == null) return false;
+        //if(sum == 0) return false;
+        return dfs(root, sum);
+    }
+    //递归判断是否有结点累加和为sum
+    public boolean dfs(TreeNode root, int sum) {
+        //递归出口
+        if(root == null) return false;//勿忘，空结点找不到路径
+        if(root.left == null && root.right == null) {//叶子结点且余数为0
+            if(sum - root.val == 0) return true;
+        }
+        //本级任务
+        boolean flag1 = dfs(root.left, sum - root.val);
+        boolean flag2 = dfs(root.right, sum - root.val);
+        //返回值
+        return flag1 || flag2;
+    }
+}
+```
+
+代码改进
+
+```java
+public class Solution {
+    /**
+     * 
+     * @param root TreeNode类 
+     * @param sum int整型 
+     * @return bool布尔型
+     */
+    public boolean hasPathSum (TreeNode root, int sum) {
+        // write code here
+        if(root == null) return false; //过了叶子结点，没找到符合条件的路径
+        if(root.left == null && root.right == null) {
+            if(sum == root.val) return true;//找到该路径
+        }
+        return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+    }
+}
 ```
 
