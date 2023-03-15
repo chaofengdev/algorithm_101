@@ -2189,3 +2189,50 @@ public class Solution {
 }
 ```
 
+方法2：先序遍历
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param root TreeNode类 
+     * @param sum int整型 
+     * @return bool布尔型
+     */
+    public boolean hasPathSum (TreeNode root, int sum) {
+        // write code here
+        if(root == null) return false;
+        Stack<TreeNode> stack1 = new Stack<>();//保存每个结点
+        Stack<Integer> stack2 = new Stack<>();//保存当前的路径和
+        stack1.push(root);
+        stack2.push(root.val);
+        while (!stack1.isEmpty()) {
+            TreeNode node = stack1.pop();
+            int cur_sum = stack2.pop();//当前为止的路径和
+            if(node.left == null && node.right == null && cur_sum == sum) {//叶子结点且路径和为sum则找到答案
+                return true;
+            }
+            if(node.right != null) {
+                stack1.push(node.right);
+                stack2.push(node.right.val + cur_sum);
+            }
+            if(node.left != null) {
+                stack1.push(node.left);
+                stack2.push(node.left.val + cur_sum);
+            }
+        }
+        return false;//没有找到合适的结点
+    }
+}
+```
+
