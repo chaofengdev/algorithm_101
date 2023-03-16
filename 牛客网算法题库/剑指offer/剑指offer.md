@@ -2266,3 +2266,28 @@ class Solution {
 }
 ```
 
+#### 二叉树中和为某一值的路径（二）
+
+```
+public class Solution {
+    ArrayList<Integer> list = new ArrayList<>();
+    ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+    public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int expectNumber) {
+        recursion(root, expectNumber);
+        return res;
+    }
+    public void recursion(TreeNode root, int target) {
+        if(root == null) return;
+        target = target - root.val;
+        list.add(root.val);//记录该结点值
+        if(root.left == null && root.right == null && target == 0) {
+            res.add(new ArrayList<>(list));//复制一个list加入到res集合中
+        }
+        recursion(root.left, target);
+        recursion(root.right, target);
+        list.remove(list.size() - 1);//删除该结点值，即回溯
+        return;
+    }
+}
+```
+
