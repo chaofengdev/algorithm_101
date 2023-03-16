@@ -2191,6 +2191,10 @@ public class Solution {
 
 方法2：先序遍历
 
+这题是少数可以用迭代非通法来解决的，如果换成通法，则因为先遍历到最左边子节点，无法有效回溯。--这点存疑。
+
+关于二叉树遍历的前序遍历的通法与非通法，详见本仓库数据结构与算法的二叉树遍历篇。
+
 ```java
 import java.util.*;
 
@@ -2268,7 +2272,11 @@ class Solution {
 
 #### 二叉树中和为某一值的路径（二）
 
-```
+方法1：递归
+
+同上，但多加了两个集合，用来正确返回题设集合。
+
+```java
 public class Solution {
     ArrayList<Integer> list = new ArrayList<>();
     ArrayList<ArrayList<Integer>> res = new ArrayList<>();
@@ -2287,6 +2295,75 @@ public class Solution {
         recursion(root.right, target);
         list.remove(list.size() - 1);//删除该结点值，即回溯
         return;
+    }
+}
+```
+
+方法2：BFS
+
+这个方法就厉害了，使用队列，同步保存根节点到本结点的全部路径。
+
+核心判断逻辑是，如果遇到叶子结点，则计算队列中路径长度，是否与target相等，相等则将该路径加入结果集合。
+
+简单纯粹且暴力，这才是算法的美妙之处，想到就能写出来。暴力求解才是浪漫。
+
+```java
+import java.util.ArrayList;
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int expectNumber) {
+        //辅助队列
+        Queue<TreeNode> nodeQ = new LinkedList<>();
+        Queue<ArrayList<Integer>> pathQ = new LinkedList<>();//保存从根结点到本结点的所有结点元素
+        //结果集合
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        if(root == null) return res;
+        //添加根结点
+        nodeQ.offer(root);
+        pathQ.offer(new ArrayList<Integer>(Arrays.asList(root.val)));//详见Arrays.asList()用法
+        //BFS
+        while(!nodeQ.isEmpty()) {
+            TreeNode node = nodeQ.poll();//结点出队
+            ArrayList<Integer> list = pathQ.poll();//路径出队
+            //list.add(node.val);//将该结点值加入路径--这里是错的，list已经包含node结点值。务必思考清楚
+            if(node.left == null && node.right == null) {//叶子结点
+                int cur_sum = 0;
+                for(int i = 0; i < list.size(); i++) {
+                    cur_sum += list.get(i);
+                }
+                if(cur_sum == expectNumber) {//当前路径和等于目标值
+                    //因为这里要添加路径，所以才设计了pathQ这个看起来奇怪的队列
+                    res.add(list);//注意可以直接保存list本身，因为每次都生成新的list
+                }
+            }
+            if(node.left != null) {
+                ArrayList<Integer> left = new ArrayList<>(list);//这里需要新的集合
+                left.add(node.left.val);
+                nodeQ.offer(node.left);
+                pathQ.offer(left);
+            }
+            if(node.right != null) {
+                ArrayList<Integer> right = new ArrayList<>(list);//这里需要新的集合
+                right.add(node.right.val);
+                nodeQ.offer(node.right);
+                pathQ.offer(right);
+
+            }
+        }
+        return res;
     }
 }
 ```
