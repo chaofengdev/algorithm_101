@@ -2236,3 +2236,33 @@ public class Solution {
 }
 ```
 
+这里只是让我们判断是否存在，如果让我们求出具体的路径呢？
+
+显然这里的一大难点是如何恰当回溯，以及如何恰当返回`List<List<Integer>>`。
+
+这里给出leetcode上的题目：二叉树中和为某一值的路径。
+
+```java
+class Solution {
+    List<Integer> list = new ArrayList<>();
+    List<List<Integer>> res = new ArrayList<>();
+    //int cur_sum = 0;
+    public List<List<Integer>> pathSum(TreeNode root, int target) {
+        recursion(root, target);
+        return res;
+    }
+    public void recursion(TreeNode root, int target) {
+        if(root == null) return;
+        target = target - root.val;
+        list.add(root.val);//记录该结点值
+        if(root.left == null && root.right == null && target == 0) {
+            res.add(new ArrayList<>(list));//复制一个list加入到res集合中
+        }
+        recursion(root.left, target);
+        recursion(root.right, target);
+        list.remove(list.size() - 1);//删除该结点值，即回溯
+        return;
+    }
+}
+```
+
