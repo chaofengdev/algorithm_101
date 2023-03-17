@@ -2434,3 +2434,50 @@ public class Solution {
 
 ```
 
+方法2：非递归中序遍历
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    public TreeNode Convert(TreeNode pRootOfTree) {
+        TreeNode cur = pRootOfTree;//工作指针
+        TreeNode head = null;
+        TreeNode pre = null;
+        Stack<TreeNode> stack = new Stack<>();
+        boolean flag = true;//标记位，表示该结点是否为首元结点
+        while(cur != null || !stack.isEmpty()) {
+            while(cur != null) {
+                stack.push(cur);
+                cur = cur.left;
+            }
+            TreeNode node = stack.pop();
+            if(flag) {
+                head = node;
+                pre = node;
+                flag = false;//更新flag
+            }else {
+                pre.right = node;
+                node.left = pre;
+                pre = node;//更新pre
+            }
+            cur = node.right;
+        }
+        return head;
+    }
+}
+
+```
+
