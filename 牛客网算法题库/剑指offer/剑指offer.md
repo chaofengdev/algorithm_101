@@ -2368,3 +2368,69 @@ public class Solution {
 }
 ```
 
+#### 二叉搜索树与双向链表
+
+方法1：递归
+
+> 显然，如果双向链表结点元素递增，则必须使用中序遍历来遍历二叉搜索树。
+>
+> **知识点1：二叉树递归**
+>
+> 递归是一个过程或函数在其定义或说明中有直接或间接调用自身的一种方法，它通常把一个大型复杂的问题层层转化为一个与原问题相似的规模较小的问题来求解。因此递归过程，最重要的就是查看能不能讲原本的问题分解为更小的子问题，这是使用递归的关键。
+>
+> 而二叉树的递归，则是将某个节点的左子树、右子树看成一颗完整的树，那么对于子树的访问或者操作就是对于原树的访问或者操作的子问题，因此可以自我调用函数不断进入子树。
+>
+> **知识点2：二叉搜索树**
+>
+> 二叉搜索树是一种特殊的二叉树，它的每个节点值大于它的左子节点，且大于全部左子树的节点值，小于它右子节点，且小于全部右子树的节点值。因此二叉搜索树一定程度上算是一种排序结构。
+>
+> **具体做法：**
+>
+> - step 1：创建两个指针，一个指向题目中要求的链表头（head），一个指向当前遍历的前一节点（pre)。
+> - step 2：首先递归到最左，初始化head与pre。
+> - step 3：然后处理中间根节点，依次连接pre与当前节点，连接后更新pre为当前节点。
+> - step 4：最后递归进入右子树，继续处理。
+> - step 5：递归出口即是节点为空则返回。
+
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    TreeNode pre = null;//指向当前结点的前一个结点
+    TreeNode head = null;//返回链表首元结点
+    public TreeNode Convert(TreeNode pRootOfTree) {
+        TreeNode root = pRootOfTree;//根节点的工作指针
+        //递归出口
+        if(root == null) return null;
+        //本级任务
+        //完成左子树的转换，或者理解为，递归到最左最小值
+        Convert(root.left);
+        //找到最小值，初始化head与pre
+        if(pre == null) {
+            head = root;//用来记录返回值，即链表首元结点
+            pre = root;
+        //当前结点与上一结点建立连接，将pre设置为当前结点值
+        }else {
+            pre.right = root;
+            root.left = pre;
+            pre = root;
+            //root = root.right;
+        }
+        Convert(root.right);
+        return head;
+    }
+}
+
+```
+
