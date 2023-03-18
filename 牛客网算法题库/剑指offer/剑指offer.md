@@ -2481,3 +2481,40 @@ public class Solution {
 
 ```
 
+#### 判断是否为平衡二叉树
+
+方法1：递归
+
+![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/B894208C51B667B8FA70DD13C43DF19E)
+
+```java
+import java.util.*;
+import java.lang.*;
+public class Solution {
+    public boolean IsBalanced_Solution(TreeNode root) {
+        if(root == null) return true;
+        boolean left = IsBalanced_Solution(root.left);
+        boolean right = IsBalanced_Solution(root.right);
+        if(left && right && Math.abs(depth(root.left) - depth(root.right)) < 2) {
+            return true;
+        }
+        return false;
+    }
+    //求二叉树高度
+    public int depth(TreeNode root) {
+        if(root == null) return 0;
+        int left_depth = depth(root.left);
+        int right_depth = depth(root.right);
+        return Math.max(left_depth, right_depth) + 1;
+    }
+}
+```
+
+方法2：自底向上
+
+![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/0D44B6EFD155E85E52000C8E9D63935F)
+
+```java
+
+```
+
