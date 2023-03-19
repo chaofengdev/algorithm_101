@@ -2483,7 +2483,11 @@ public class Solution {
 
 #### 判断是否为平衡二叉树
 
-方法1：递归
+方法1：先序遍历+判断深度
+
+> 这个方法容易想到，但会产生大量的重复运算，时间复杂度很高。
+>
+> 思路是构造一个获取当前子树深度的函数`depth()`，通过比较某子树的左右子树的深度差是否成立，来判断子树是否为二叉搜索树。若所有子树平衡，则此树平衡。
 
 ![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/B894208C51B667B8FA70DD13C43DF19E)
 
@@ -2510,11 +2514,43 @@ public class Solution {
 }
 ```
 
-方法2：自底向上
+方法2：后序遍历+剪枝
+
+> 思路是对二叉树做后序遍历，从底至顶返回子树的深度，如果判定某子树不是平衡树则“剪枝”，直接向上返回。
+>
+> 设计一个递归函数，
+>
+> 当结点左右子树深度差小于等于1，则返回当前子树的深度；
+>
+> 当结点左右子树深度差大于2，则返回-1，代表此子树不是平衡树。
 
 ![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/0D44B6EFD155E85E52000C8E9D63935F)
 
 ```java
-
+public class Solution {
+    public boolean IsBalanced_Solution(TreeNode root) {
+        if(root == null) return false;
+        if(depth(root) == -1) {
+            return false;
+        }else {
+            return true;
+        }
+    }
+    //求解树的高度的同时判断是否为二叉平衡树
+    //返回-1表示不是二叉平衡树，否则表示树的高度
+    public int depth(TreeNode root) {
+        if(root == null) return 0;//空树，是二叉平衡树，返回树的高度0
+        int left = depth(root.left);//求左子树的高度
+        if(left < 0) return -1;
+        int right = depth(root.right);
+        if(right < 0) return -1;
+        if(Math.abs(right - left) > 1) {
+            return -1;//不是二叉平衡树，返回-1
+        }else {
+            return Math.max(left, right) + 1;//是二叉平衡树，返回树的高度
+        }
+        //return 0;
+    }
+}
 ```
 
