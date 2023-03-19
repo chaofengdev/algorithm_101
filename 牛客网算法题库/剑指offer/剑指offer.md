@@ -2554,3 +2554,54 @@ public class Solution {
 }
 ```
 
+#### 二叉树的下一个结点
+
+方法1：暴力求解
+
+> 输入的是某个结点并不是根节点，所以通过next指针找到根结点；
+>
+> 根据根节点进行中序遍历，将所有结点保存在集合中；
+>
+> 遍历集合，找到根结点，下一个就是我们要找的“下一个结点”。--这里的特殊情况是，最后一个结点没有下一个结点，所以直接遍历到倒数第二个结点即可，否则返回null。
+
+```java
+/*
+public class TreeLinkNode {
+    int val;
+    TreeLinkNode left = null;
+    TreeLinkNode right = null;
+    TreeLinkNode next = null;
+
+    TreeLinkNode(int val) {
+        this.val = val;
+    }
+}
+*/
+import java.util.*;
+public class Solution {
+    List<TreeLinkNode> list = new ArrayList<>();
+    public TreeLinkNode GetNext(TreeLinkNode pNode) {
+        //难点：获取根结点
+        TreeLinkNode root = pNode;
+        while(root.next != null) {
+            root = root.next;
+        }
+        inOrder(root);
+        for(int i = 0; i < list.size() - 1; i++) {//难点：最后一个结点不需要遍历
+            if(list.get(i) == pNode) {
+                return list.get(i + 1);
+            }
+        }
+        return null;
+    }
+    //中序遍历
+    public void inOrder(TreeLinkNode root) {
+        if(root == null) return;
+        inOrder(root.left);
+        list.add(root);
+        inOrder(root.right);
+    }
+}
+
+```
+
