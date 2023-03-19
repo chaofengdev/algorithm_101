@@ -2605,3 +2605,54 @@ public class Solution {
 
 ```
 
+方法2：分类直接寻找
+
+> 仔细观察，可以把中序下一结点归为几种类型：
+>
+> 1. 有右子树，下一结点是右子树中的最左结点，例如 B，下一结点是 H
+> 2. 无右子树，且结点是该结点父结点的左子树，则下一结点是该结点的父结点，例如 H，下一结点是 E
+> 3. 无右子树，且结点是该结点父结点的右子树，则我们一直沿着父结点追朔，直到找到某个结点是其父结点的左子树，如果存在这样的结点，那么这个结点的父结点就是我们要找的下一结点。例如 I，下一结点是 A；例如 G，并没有符合情况的结点，所以 G 没有下一结点
+
+![img](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/1078265_1565349624574_CDC679BEBBE282E170AB6FE0DCA8445E)
+
+```java
+/*
+public class TreeLinkNode {
+    int val;
+    TreeLinkNode left = null;
+    TreeLinkNode right = null;
+    TreeLinkNode next = null;
+
+    TreeLinkNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    public TreeLinkNode GetNext(TreeLinkNode pNode) {
+        //直接分三种情况来解决
+        //1.该结点有右子树，则下一个结点是右子树的最左边结点
+        if(pNode.right != null) {
+            TreeLinkNode cur = pNode.right;
+            while(cur.left != null) cur = cur.left;
+            return cur;
+        }
+        //2.该结点无右子树，该节点是父结点的左子结点，下一个结点就是父结点
+        while(pNode.next != null && pNode == pNode.next.left) {
+            return pNode.next;
+        }
+        //3.该结点无右子树，该节点是父结点的右子结点，下一个结点是
+        //沿着父结点追溯，直到找到“某个结点是其父节点的左子树”--这里不是很好理解
+        if(pNode.next != null) {
+            TreeLinkNode parentNode = pNode.next;//该结点的父结点
+            while(parentNode.next != null && parentNode == parentNode.next.right) {//难点：结合图像来看比较直观
+                parentNode = parentNode.next;//向上追溯
+            }
+            return parentNode.next;//返回这个结点的父结点，即为满足条件的“下一个结点”
+        }
+        return null;//除了以上三种情况，返回null表示没有“下一个结点”
+    }
+}
+
+```
+
