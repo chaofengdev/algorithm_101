@@ -2753,3 +2753,112 @@ public class Solution {
 
 ```
 
+#### 把二叉树打印成多行
+
+经典题型。
+
+```java
+import java.util.*;
+public class Solution {
+    ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        Deque<TreeNode> queue = new LinkedList<>();
+        TreeNode root = pRoot;
+        if(root == null) return res;//判空
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int n = queue.size();
+            ArrayList<Integer> list = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            res.add(list);
+        }
+        return res;
+    }
+
+}
+```
+
+#### 序列化二叉树
+
+> 这题真的细节很多，也是稍微有点复杂度，有实际应用的题目。
+>
+> 所以需要考虑的东西就比较多，不是那么简单层序遍历。
+
+```java
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+}
+*/
+import java.util.*;
+
+public class Solution {
+    int INF = -1;
+    TreeNode emptyNode = new TreeNode(INF);//空结点定义
+    String Serialize(TreeNode root) {
+        if (root == null) return "";
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        StringBuilder sb = new StringBuilder();
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            //int value = node.val;
+            sb.append(node.val + ",");//从队列中取出元素进行拼接
+            //判断左右子结点是否为空，为空加入空结点
+            //注意，这里要首先判断该结点是否为emptyNode结点，如果是则不作任何处理
+            if (node.val != -1) {//!node.equals(emptyNode)
+                if (node.left == null) {
+                    queue.offer(emptyNode);
+                } else {
+                    queue.offer(node.left);
+                }
+                if (node.right == null) {
+                    queue.offer(emptyNode);
+                } else {
+                    queue.offer(node.right);
+                }
+            }
+        }
+        System.out.println(sb.toString());//1,2,3,-1,-1,6,7,-1,-1,-1,-1,
+        return sb.toString();
+    }
+    TreeNode Deserialize(String str) {
+        if(str == "") return null;//空串代表空树
+        String[] strArr = str.split(",");
+        int n = strArr.length;
+        //怎么序列化就怎么反序列化
+        TreeNode root = new TreeNode(Integer.parseInt(strArr[0]));//构建根结点
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        //遍历字符数组，反序列化二叉树
+        for(int i = 1; i < n - 1; i += 2) {//注意这里的下标，难点在于这里的细节，细节有很多
+            TreeNode node = queue.poll();//父结点
+            int a = Integer.parseInt(strArr[i]);//node的左子结点值
+            int b = Integer.parseInt(strArr[i + 1]);//node的右子结点值
+            //ab等于-1时，表示空结点，直接不处理，默认指向null
+            if(a != -1) {
+                node.left = new TreeNode(a);
+                queue.offer(node.left);
+            }
+            if(b != -1) {
+                node.right = new TreeNode(b);
+                queue.offer(node.right);
+            }
+        }
+        return root;//返回树的根结点
+    }
+}
+```
+
