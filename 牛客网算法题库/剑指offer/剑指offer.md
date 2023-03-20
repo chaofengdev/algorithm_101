@@ -2656,3 +2656,100 @@ public class Solution {
 
 ```
 
+#### 对称的二叉树
+
+方法1：层次遍历
+
+> 如果直接层次遍历，需要判断每一层是否是回文串，比较麻烦。
+>
+> 我们使用两个队列，分别对根节点的左右子树进行层序遍历，这样每次比较弹出来的两个结点值是否相等，来判断是否对称。
+>
+> 所有结点都判断完毕后，返回true，说明子树是对称的。详见下面这张图。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/85DF4B5D7201281FAB466F5273C21994)
+
+```java
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+import java.util.*;
+public class Solution {
+    boolean isSymmetrical(TreeNode pRoot) {
+        //利用两个队列，分别遍历左右子树并互相比较
+        //这样就不用判断同层是否是回文串了
+        TreeNode root = pRoot;
+        if(root == null) return true;
+        Deque<TreeNode> queue1 = new LinkedList<>();
+        Deque<TreeNode> queue2 = new LinkedList<>();
+        queue1.offer(root.left);
+        queue2.offer(root.right);
+        while(!queue1.isEmpty() && !queue2.isEmpty()) {
+            TreeNode node1 = queue1.poll();
+            TreeNode node2 = queue2.poll();
+            if(node1 == null && node2 == null) {//空结点略过
+                continue;
+            }
+            if(node1 == null || node2 == null || node1.val != node2.val) {
+                return false;
+            }
+            //左子树、右子树
+            queue1.offer(node1.left);
+            queue1.offer(node1.right);
+            //右子树、左子树
+            queue2.offer(node2.right);
+            queue2.offer(node2.left);
+        }
+        return true;//没有检查到不匹配，说明是对称的。
+    }
+}
+
+```
+
+方法2：递归
+
+这题的递归还真不好想，看看k神是怎么分析的。
+
+![image-20230320181916890](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230320181916890.png)
+
+```java
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    boolean isSymmetrical(TreeNode pRoot) {
+        TreeNode root = pRoot;
+        if(root == null) return true;
+        return recursion(root.left,root.right);
+    }
+    //判断两棵树是否镜像对称
+    public boolean recursion(TreeNode L, TreeNode R) {
+        if(L == null && R == null) return true;
+        if(L == null || R == null || L.val != R.val) {
+            return false;
+        }
+        return recursion(L.left, R.right) && recursion(L.right, R.left);//难点在这里，仔细思考一下
+    }
+}
+
+```
+
