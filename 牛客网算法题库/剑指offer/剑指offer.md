@@ -2862,3 +2862,80 @@ public class Solution {
 }
 ```
 
+来自leetcode上的k神的写法，可以学到很多东西。
+
+> 这题算基本功题，在数量掌握二叉树BFS的基础上，
+>
+> 合理使用api，包括String类转Integer，字符串的截取和拆分成数组，StringBuilder对象删除指定位置的字符等等。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Codec {
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        //层序遍历BFS实现序列化二叉树
+        //空树，返回字符串"[]"
+        if(root == null) return "[]";
+        //保存序列化后的二叉树
+        StringBuilder sb = new StringBuilder();
+        //遍历二叉树的辅助队列
+        //Deque<TreeNode> queue = new ArrayDeque<>();ArrayDeque不能添加null
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        sb.append("[");
+        while(!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if(node != null) {
+                sb.append(node.val).append(",");//提高性能
+                queue.offer(node.left);
+                queue.offer(node.right);
+            }else {
+                sb.append("null").append(",");
+            }
+        }
+        sb.deleteCharAt(sb.length() - 1);//新api删除指定位置的字符
+        sb.append("]");
+        //System.out.println(sb.toString());//相比于标准输出，会多输出叶子结点的左右空指针
+        return sb.toString();//[1,2,3,null,null,4,5,null,null,null,null]
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        //层序遍历BFS实现反序列化二叉树
+        if(data.equals("[]")) return null;
+        String[] strArr = data.substring(1,data.length() - 1).split(",");//合理使用api
+        Queue<TreeNode> queue = new LinkedList<>();
+        TreeNode root = new TreeNode(Integer.parseInt(strArr[0]));//新建根结点
+        queue.offer(root);
+        int index = 1;
+        while(!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if(!strArr[index].equals("null")) {
+                node.left = new TreeNode(Integer.parseInt(strArr[index]));//合理使用api
+                queue.offer(node.left);
+            }
+            index++;
+            if(!strArr[index].equals("null")) {
+                node.right = new TreeNode(Integer.parseInt(strArr[index]));//合理使用api
+                queue.offer(node.right);
+            }
+            index++;
+        }
+        return root;
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.deserialize(codec.serialize(root));
+```
+
