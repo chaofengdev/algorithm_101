@@ -2120,7 +2120,7 @@ public class Solution {
 ...
 ```
 
-#### 二叉树中和为某一值的路径
+#### 二叉树中和为某一值的路径（一）
 
 方法1：递归
 
@@ -2367,6 +2367,108 @@ public class Solution {
     }
 }
 ```
+
+#### 二叉树中和为某一值的路径（三）
+
+方法1：两次递归遍历
+
+> 辅助函数每次寻找根节点开始的符合条件的路径；
+>
+> 主函数先序遍历二叉树的所有结点，每个结点都是一个起点，即子树的根结点。
+>
+> - step 1：每次将原树中遇到的节点作为子树的根节点送入dfs函数中查找有无路径，如果该节点为空则返回。--核心解题思路
+> - step 2：然后递归遍历这棵树每个节点，每个节点都需要这样操作。
+> - step 3：在dfs函数中，也是往下递归，遇到一个节点就将sum减去节点值再往下。
+> - step 4：剩余的sum等于当前节点值则找到一种情况。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param root TreeNode类 
+     * @param sum int整型 
+     * @return int整型
+     */
+    int res = 0;//符合条件的路径总数
+    public int FindPath (TreeNode root, int sum) {
+        // write code here
+        //递归出口
+        if(root == null) return res;
+        //本级任务
+        dfs(root, sum);
+        //进入子节点继续找
+        FindPath(root.left, sum);
+        FindPath(root.right, sum);
+        return res;
+    }
+    //查询以某结点为根的路径数
+    public void dfs(TreeNode root, int sum) {
+        //递归出口
+        if(root == null) return ;
+        //本级任务：判断sum与当前结点值是否相同
+        if(root.val == sum) res++;
+        //进入子节点继续找
+        dfs(root.left, sum - root.val);
+        dfs(root.right, sum - root.val);
+    }
+
+}
+```
+
+下面的方法精彩但小众。先贴在这里，以后再看吧。
+
+```java
+import java.util.*;
+public class Solution {
+    //记录路径和及条数
+    private HashMap<Integer, Integer> mp = new HashMap<Integer, Integer>(); 
+    //last为到上一层为止的累加和
+    private int dfs(TreeNode root, int sum, int last){ 
+        //空结点直接返回
+        if(root == null) 
+            return 0;
+        int res = 0;
+        //到目前结点为止的累加和
+        int temp = root.val + last; 
+        //如果该累加和减去sum在哈希表中出现过，相当于减去前面的分支
+        if(mp.containsKey(temp - sum))  
+            //加上有的路径数
+            res += mp.get(temp - sum); 
+        //增加该次路径和
+        mp.put(temp, mp.getOrDefault(temp, 0) + 1);
+        //进入子结点
+        res += dfs(root.left, sum, temp); 
+        res += dfs(root.right, sum, temp); 
+        //回退该路径和，因为别的树枝不需要这边存的路径和
+        mp.put(temp, mp.get(temp) - 1);
+        return res;
+    }
+
+    public int FindPath (TreeNode root, int sum) {
+        //路径和为0的有1条
+        mp.put(0, 1); 
+        return dfs(root, sum, 0);
+    }
+}
+
+```
+
+
 
 #### 二叉搜索树与双向链表
 
@@ -2937,5 +3039,70 @@ public class Codec {
 // Your Codec object will be instantiated and called as such:
 // Codec codec = new Codec();
 // codec.deserialize(codec.serialize(root));
+```
+
+#### 两个结点的公共祖先
+
+方法1：路径比较法--暴力求解
+
+```java
+ import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     *
+     * @param root TreeNode类
+     * @param o1 int整型
+     * @param o2 int整型
+     * @return int整型
+     */
+    boolean flag = false; //记录是否找到到o的路径--难点
+    public int lowestCommonAncestor (TreeNode root, int o1, int o2) {
+        // write code here
+        //保存两条路径
+        ArrayList<Integer> path1 = new ArrayList<>();
+        ArrayList<Integer> path2 = new ArrayList<>();
+        //递归
+        findPath(root, path1, o1);
+        flag = false;//重置flag
+        findPath(root, path2, o2);
+        //求两条路径最后一个相同的元素并返回
+        int res = 0;//临时保存相同的元素
+        for (int i = 0; i < path1.size() && i < path2.size(); i++) {
+            int x = path1.get(i);
+            int y = path2.get(i);
+            if (x == y) {
+                res = x;
+            } else {
+                break;
+            }
+        }
+        return res;
+    }
+    //查找从根结点到某个结点(值)的路径，并返回结果集合
+    public void findPath(TreeNode root, ArrayList<Integer> path, int value) {//注意：path为引用传递
+        if(root == null || flag) {//找到直接返回（这里可以剪枝，减少时间复杂度）
+            return ;
+        }
+        path.add(root.val);
+        if(root.val == value) {
+            flag = true;//表示已经找到
+            return ;
+        }
+        findPath(root.left, path, value);
+        findPath(root.right, path, value);
+        if(flag) return ;//找到，则直接返回，如果不返回而是回溯则会丢失目标结点元素--本题关键
+        path.remove(path.size() - 1);//没找到，则回溯
+    }
+
+}
 ```
 
