@@ -3041,9 +3041,15 @@ public class Codec {
 // codec.deserialize(codec.serialize(root));
 ```
 
-#### 两个结点的公共祖先
+#### 两个结点的公共祖先 *
 
 方法1：路径比较法--暴力求解
+
+> 这题足够简单暴力，但是有个问题不太好解决，如何写findPath求解根结点到目标结点的路径？
+>
+> 要求将路径保存到ArrayList<Integer> list中，仔细思考下写法。
+>
+> 体会一下回溯和剪枝终止回溯的方法。
 
 ```java
  import java.util.*;
@@ -3102,7 +3108,89 @@ public class Solution {
         if(flag) return ;//找到，则直接返回，如果不返回而是回溯则会丢失目标结点元素--本题关键
         path.remove(path.size() - 1);//没找到，则回溯
     }
+}
+```
+
+针对查找从根结点到目标结点（值）的路径，还可以这样写。--来自chatgpt的解答。
+
+> 主要解决了一个问题，就是找到目标结点如何正确返回的问题。前者是通过flag标志，如果flag为true，则表示找到了目标结点，不用回溯当前结点；反之，需要回溯当前结点。
+>
+> 后者是通过自带的boolean返回值，如果左右子树都是false，则没有找到目标结点，需要回溯；左子树为true，表示左子树中找到目标值，直接返回true，右子树同理，如果都没有找到，则回溯并返回false。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     *
+     * @param root TreeNode类
+     * @param o1 int整型
+     * @param o2 int整型
+     * @return int整型
+     */
+    boolean flag = false; //记录是否找到到o的路径--难点
+    public int lowestCommonAncestor (TreeNode root, int o1, int o2) {
+        // write code here
+        //保存两条路径
+        ArrayList<Integer> path1 = new ArrayList<>();
+        ArrayList<Integer> path2 = new ArrayList<>();
+        //递归
+        findPath(root, path1, o1);
+        //flag = false;//重置flag
+        findPath(root, path2, o2);
+        //求两条路径最后一个相同的元素并返回
+        int res = 0;//临时保存相同的元素
+        for (int i = 0; i < path1.size() && i < path2.size(); i++) {
+            int x = path1.get(i);
+            int y = path2.get(i);
+            if (x == y) {
+                res = x;
+            } else {
+                break;
+            }
+        }
+        return res;
+    }
+    //查找从根结点到某个结点(值)的路径，并返回结果集合
+    public boolean findPath(TreeNode root, ArrayList<Integer> path,
+                         int value) {//注意：path为引用传递
+        if (root == null) {
+        return false;
+    }
+    // 将当前节点的值添加到路径中
+    path.add(root.val);
+    // 如果当前节点的值等于目标值，打印路径并返回true
+    if (root.val == value) {
+        System.out.println(path);
+        return true;
+    }
+    // 在左子树中查找目标值
+    boolean found = findPath(root.left, path, value);
+    // 如果在左子树中找到了目标值，返回true
+    if (found) {
+        return true;
+    }
+    // 在右子树中查找目标值
+    found = findPath(root.right, path, value);
+    // 如果在右子树中找到了目标值，返回true
+    if (found) {
+        return true;
+    }
+    // 如果左子树和右子树中都没有找到目标值，删除当前节点的值，并返回false
+    path.remove(path.size() - 1);
+    return false;
+
+    }
 
 }
 ```
 
+方法2：递归--很简单的写法但是不好理解。
