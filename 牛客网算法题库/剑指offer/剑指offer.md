@@ -3194,3 +3194,95 @@ public class Solution {
 ```
 
 方法2：递归--很简单的写法但是不好理解。
+
+> 这种方法需要拓展原递归函数的含义，具体见注释。
+>
+> 总之没有提前背过，基本不太可能写出这种方法。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param root TreeNode类 
+     * @param o1 int整型 
+     * @param o2 int整型 
+     * @return int整型
+     */
+    public int lowestCommonAncestor (TreeNode root, int o1, int o2) {
+        // write code here
+        if(root == null) return -1;//表示没有找到最近公共祖先
+        if(root.val == o1 || root.val == o2) return root.val;//pq其中一个为root，则直接返回root值
+        //o1o2均存在，左子树中找o1o2的最近公共祖先；其中一个不存在，则找存在的一个；都不存在，返回-1
+        int left = lowestCommonAncestor(root.left, o1, o2);
+        //o1o2均存在，右子树中找o1o2的最近公共祖先；其中一个不存在，则找存在的一个；都不存在，返回-1
+        int right = lowestCommonAncestor(root.right, o1, o2);
+        if(left == -1 && right == -1) {
+            return -1;
+        }
+        if(left == -1) {
+            return right;
+        }
+        if(right == -1) {
+            return left;
+        }
+        return root.val;//if(left != -1 && right != -1)
+    }
+}
+```
+
+#### 二叉搜索树的最近公共祖先
+
+方法1：直接将二叉搜索树当做二叉树，利用递归
+
+> 方法同上。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param root TreeNode类 
+     * @param p int整型 
+     * @param q int整型 
+     * @return int整型
+     */
+    public int lowestCommonAncestor (TreeNode root, int p, int q) {
+        // write code here
+        if(root == null) return -1;
+        if(root.val == p || root.val == q) {
+            return root.val;
+        }
+        int left = lowestCommonAncestor(root.left, p, q);
+        int right = lowestCommonAncestor(root.right, p, q);
+        if(left != -1 && right != -1) return root.val;
+        if(left == -1) return right;
+        if(right == -1) return left;
+        return -1;//if(left == -1 && right == -1)
+    }
+}
+```
+
