@@ -3286,3 +3286,171 @@ public class Solution {
 }
 ```
 
+方法2：利用二叉搜索树的性质
+
+> 一个不太好的解答。
+>
+> 问题在于最后必须要返回，但是返回-1不太恰当因为穷举了所有的可能性，这个return不会执行。那么如何更改呢？
+>
+> 虽然正确性提高，但是可读性降低了。仁者见仁智者见智吧。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     *
+     * @param root TreeNode类
+     * @param p int整型
+     * @param q int整型
+     * @return int整型
+     */
+    public int lowestCommonAncestor (TreeNode root, int p, int q) {
+        if (root == null) return -1;
+        // write code here
+        if (root.val == p || root.val == q) {
+            return root.val;
+        }
+        if ((root.val > p && root.val < q) || (root.val < p && root.val > q)) {
+            return root.val;
+        }
+        if (root.val < p && root.val < q) {
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        if (root.val > p && root.val > q) {
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        return -1;
+    }
+
+}
+```
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     *
+     * @param root TreeNode类
+     * @param p int整型
+     * @param q int整型
+     * @return int整型
+     */
+    public int lowestCommonAncestor (TreeNode root, int p, int q) {
+        //空树找不到公共祖先
+        if (root == null) return -1;
+        // write code here
+        if (root.val == p || root.val == q) {
+            return root.val;
+        }
+        //pq在该节点两边说明这就是最近公共祖先
+        if ((root.val > p && root.val < q) || (root.val < p && root.val > q)) {
+            return root.val;
+        }else if (root.val < p && root.val < q) {//pq都在该节点的左边
+            return lowestCommonAncestor(root.right, p, q);
+        }else{//pq都在该节点的右边
+            return lowestCommonAncestor(root.left, p, q);
+        }
+    }
+
+}
+```
+
+方法3：路径比较法
+
+> getPath找到路径并保存到集合中，然后比较两个集合，找到最后一个不同的元素返回即可。
+>
+> 暴力求解更考验代码基本功。因为是二叉搜索树，所以不需要像普通二叉树那样利用递归求路径，直接循环判断即可。
+
+```java
+import java.util.*;
+
+/*
+ * public class TreeNode {
+ *   int val = 0;
+ *   TreeNode left = null;
+ *   TreeNode right = null;
+ *   public TreeNode(int val) {
+ *     this.val = val;
+ *   }
+ * }
+ */
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param root TreeNode类 
+     * @param p int整型 
+     * @param q int整型 
+     * @return int整型
+     */
+    public int lowestCommonAncestor (TreeNode root, int p, int q) {
+        // write code here
+        //特例
+        if(root == null) return -1;
+        //求两条路径
+        ArrayList<Integer> path1 = getPath(root, p);
+        ArrayList<Integer> path2 = getPath(root, q);
+        System.out.println(path1);
+        System.out.println(path2);
+        //比较两条路径
+        int res = 0;
+        int index = 0;
+        while(index < path1.size() && index < path2.size()) {
+            if(path1.get(index) == path2.get(index)) {
+                res = path1.get(index);
+            }else {
+                break;//提前结束
+            }
+            index++;
+        }
+        return res;
+    }
+    public ArrayList<Integer> getPath(TreeNode root, int target) {
+        ArrayList<Integer> res = new ArrayList<>();
+        TreeNode cur = root;
+        if(root == null) return res;
+        while(cur.val != target) {
+            res.add(cur.val);
+            if(target < cur.val) {
+                cur = cur.left;
+            }
+            if(target > cur.val) {
+                cur = cur.right;
+            }
+        }
+        res.add(cur.val);//补充target结点值
+        return res;
+    }
+}
+```
+
