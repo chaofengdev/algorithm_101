@@ -3589,3 +3589,28 @@ public void push(int node) {
     }
 ```
 
+#### 栈的压入、弹出序列
+
+> 来自chatgpt的解释。
+>
+> 这个算法是用来判断一个给定的弹出序列 `popA` 是否合法，也就是是否可以由一个给定的压入序列 `pushA` 得到。算法使用了辅助栈 `stack` 来模拟压入和弹出操作，遍历 `pushA` 数组，依次将元素压入 `stack` 中。在每次压入操作后，需要检查 `stack` 栈顶元素是否与 `popA` 数组当前需要弹出的元素相同，如果相同，则将栈顶元素弹出，并将 `popA` 数组的指针向后移动一位。重复这个过程，直到 `pushA` 数组遍历结束。最后，如果 `stack` 栈为空，则说明 `popA` 序列是一个合法的弹出序列，返回 `true`，否则返回 `false`。
+
+```java
+import java.util.*;
+
+public class Solution {
+    public boolean IsPopOrder(int [] pushA,int [] popA) {
+        Stack<Integer> stack = new Stack<>();//辅助栈
+        int index = 0;
+        for(int i = 0; i < pushA.length; i++) {//遍历pushA
+            stack.push(pushA[i]);
+            while(!stack.isEmpty() && stack.peek() == popA[index]) {
+                stack.pop();
+                index++;
+            }
+        }
+        return stack.isEmpty();//判断栈是否为空，为空则返回true，表示弹出序列正确。
+    }
+}
+```
+
