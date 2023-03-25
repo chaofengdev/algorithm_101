@@ -3614,3 +3614,37 @@ public class Solution {
 }
 ```
 
+#### 翻转单词序列
+
+方法1：栈
+
+```java
+import java.util.*;
+public class Solution {
+    public String ReverseSentence(String str) {
+        Stack<String> stack = new Stack<>();
+        String[] temp = str.split(" ");
+        for(int i = 0; i < temp.length; i++) {
+            stack.push(temp[i]);
+            stack.push(" ");
+        }
+        StringBuilder res = new StringBuilder();
+        if(!stack.isEmpty()) {
+            stack.pop();
+        }
+        while(!stack.isEmpty()) {
+            res.append(stack.pop());
+        }
+        return res.toString();        
+    }
+    
+}
+
+```
+
+方法2：两次翻转
+
+```java
+
+```
+
