@@ -3454,3 +3454,84 @@ public class Solution {
 }
 ```
 
+## 队列和栈
+
+#### 用两个栈实现队列
+
+方法1：
+
+> 这个思路稍微复杂一点，纯个人想法。
+>
+> 判断栈2是否为空，不为空就依次弹出；
+>
+> 如果为空，将栈1的元素弹出到栈2，然后弹出一个栈顶元素。
+>
+> 这样做是为了避免，123进去栈1，然后321进栈2，弹出1，然后又进了4，此时要弹出的是2，所以不能直接把4进栈1然后入栈2，而是等123都从栈2弹出后，元素4才能进栈2.
+>
+> 稍微有点拗口，我用chatgpt来解释一下。
+>
+> > 这是一个实现队列的Java代码。在这个队列中，push方法用于向队列中添加元素，pop方法用于从队列中弹出元素。
+> >
+> > 该队列的内部实现使用了两个栈stack1和stack2。元素首先被添加到stack1中，当需要弹出元素时，如果stack2不为空，则直接从stack2中弹出元素；否则，将stack1中的元素逐个弹出，并依次放入stack2中，然后再从stack2中弹出元素。这样做的目的是为了保证队列的先进先出的原则。
+> >
+> > 具体来说，push方法将元素压入stack1中，而pop方法则首先判断stack2是否为空，如果不为空，则直接从stack2中弹出元素；否则，将stack1中的所有元素逐个弹出，并放入stack2中，然后再从stack2中弹出元素。这样做的效果是将原来在stack1中的元素顺序反转，从而保证弹出的元素顺序与添加的顺序一致。最后，pop方法返回弹出的元素。
+
+```java
+import java.util.Stack;
+
+public class Solution {
+    Stack<Integer> stack1 = new Stack<Integer>();
+    Stack<Integer> stack2 = new Stack<Integer>();
+
+    public void push(int node) {
+        //压多少进stack1，弹出放进stack2
+        stack1.push(node);
+    }
+
+    public int pop() {
+        //这里容易出错，如果stack2中还有元素，优先弹出stack2中的元素，不能直接将stack1中的元素弹出放进stack2
+        if (!stack2.isEmpty()) {
+            return stack2.pop();
+        } else {//stack2为空，则弹出stack1的元素进stack2
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+            return stack2.pop();
+        }
+        //return stack2.pop();
+    }
+}
+
+```
+
+方法2：
+
+> 方法2思路更简单，但是复杂度更高。
+>
+> 每次正常将node压栈，取出的时候，每次都将栈1的元素都放入到栈2，栈2的栈顶元素弹出并记录，然后将栈2的元素都放回栈1，同时返回刚刚记录的元素值。
+
+```java
+import java.util.Stack;
+
+public class Solution {
+    Stack<Integer> stack1 = new Stack<Integer>();
+    Stack<Integer> stack2 = new Stack<Integer>();
+
+    public void push(int node) {
+        //压多少进stack1，弹出放进stack2
+        stack1.push(node);
+    }
+
+    public int pop() {
+        while(!stack1.isEmpty()) {
+            stack2.push(stack1.pop());
+        }
+        int res = stack2.pop();
+        while(!stack2.isEmpty()) {
+            stack1.push(stack2.pop());
+        }
+        return res;
+    }
+}
+```
+
