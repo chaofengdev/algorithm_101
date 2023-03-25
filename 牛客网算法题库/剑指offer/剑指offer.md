@@ -3535,3 +3535,57 @@ public class Solution {
 }
 ```
 
+#### 包含min函数的栈
+
+方法1：双栈法、单调栈
+
+```java
+import java.util.Stack;
+
+public class Solution {
+    Stack<Integer> stack1 = new Stack<>();//栈
+    Stack<Integer> stack2 = new Stack<>();//辅助栈，保存截止到当前元素的最小值
+    
+    public void push(int node) {
+        stack1.push(node);
+        if(stack2.isEmpty()) {//stack2可能为空
+            stack2.push(node);
+        }else {//stack2不为空的情况
+            if(stack2.peek() > node) {
+                stack2.push(node);
+            }else {
+                stack2.push(stack2.peek());
+            }
+        }
+    }
+    
+    public void pop() {
+        stack1.pop();
+        stack2.pop();
+    }
+    
+    public int top() {
+        return stack1.peek();
+    }
+    
+    public int min() {
+        return stack2.peek();//stack2的栈顶元素始终是stack1目前的最小元素值
+    }
+}
+
+```
+
+核心部分可以更改一下。
+
+```java
+public void push(int node) {
+        stack1.push(node);
+        //空或者新元素较小，则入栈
+        if(stack2.isEmpty() || stack2.peek() > node) {
+            stack2.push(node);
+        }else {//重复加入栈顶
+            stack2.push(stack2.peek());
+        }
+    }
+```
+
