@@ -3618,6 +3618,14 @@ public class Solution {
 
 方法1：栈
 
+> 利用str.split(" ")将字符串分割为字符串数组，
+>
+> 取出字符串数组中的各字符串，依次进栈出栈，
+>
+> 用res来保存结果并返回。
+>
+> 注意要弹出栈中多余的一个空格。
+
 ```java
 import java.util.*;
 public class Solution {
@@ -3629,7 +3637,7 @@ public class Solution {
             stack.push(" ");
         }
         StringBuilder res = new StringBuilder();
-        if(!stack.isEmpty()) {
+        if(!stack.isEmpty()) {//弹出多的空格
             stack.pop();
         }
         while(!stack.isEmpty()) {
@@ -3637,14 +3645,68 @@ public class Solution {
         }
         return res.toString();        
     }
-    
 }
 
 ```
 
-方法2：两次翻转
+当然，因为已经有字符串数组存在，所以我们直接逆序遍历数组，除了最后一个字符串后不需要加上空格，其他的都需要加一个空格，我们借助StringBuilder提高效率。
 
 ```java
+import java.util.*;
+
+public class Solution {
+    public String ReverseSentence(String str) {
+        str = str.trim();
+        String[] strArr = str.split(" ");
+        StringBuilder res = new StringBuilder();
+        int i = 0;
+        for(i = strArr.length - 1; i >= 0; i--) {
+            res.append(strArr[i]);
+            if(i != 0) {
+                res.append(" ");
+            }
+        }
+        return res.toString();
+    }
+}
+```
+
+方法2：两次翻转
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/7269932FDD7F8BA760B50D8A119A60C0)
+
+> 这种方法就不需要借助过多的api，考察基本功。
+>
+> 以前写过，但是又忘了。写法很多，可以自己尝试多种方法。
+
+```java
+public class Solution {
+    public String ReverseSentence(String str) {
+        char[] chArr = str.toCharArray();//字符串转字符数组
+        reverse(chArr, 0, chArr.length - 1);//整体翻转
+        for(int i = 0; i < str.length(); i++) {
+            int j = i;
+            while(j <= chArr.length - 1 && chArr[j] != ' ') {//以空格为界找到第一个单词，注意j可能越界
+                j++;
+            }
+            reverse(chArr, i, j - 1);
+            i = j;
+        }
+        return new String(chArr);//字符数组与字符串的转换
+    }
+    //字符串翻转函数
+    public void reverse(char[] chArr, int left, int right) {
+        while(left < right) {//考虑字符数组偶数或者奇数的情况
+            swap(chArr, left++, right--);
+        }
+    }
+    //字符交换函数
+    public void swap(char[] chArr, int left, int right) {
+        char temp = chArr[left];
+        chArr[left] = chArr[right];
+        chArr[right] = temp;
+    }
+}
 
 ```
 
