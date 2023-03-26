@@ -3710,3 +3710,39 @@ public class Solution {
 
 ```
 
+#### 数字序列中某一位的数字
+
+这题很有意思，但是貌似和堆栈没太大关系。
+
+> - step 1：使用循环求n是属于几位数，i从1位数开始，每次给它增加10^i个0，即n位数往后推10^i。
+> - step 2：找到目标数字后，通过数字对位数求除法找到该数字，转化为字符串类型。
+> - step 3：再通过对位数取模判断是哪一位数。
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     *
+     * @param n int整型
+     * @return int整型
+     */
+    public int findNthDigit (int n) {
+        // write code here
+        //记录n是几位数
+        int i = 1;
+        while (i * Math.pow(10, i) <
+                n) { //每次比较i*10^i与n的大小，n最终落在i位数上（用于确定 n 所在的数字是几位数）
+            //前面添0增加的位
+            n += Math.pow(10, i); //不断添0，每次添加的都是10^i个0
+            i++;
+        }
+        String num = "" + (n / i);//第num个数组
+        return (int) (num.charAt(n % i)) - (int)('0');//结果需要从String转回int
+    }
+}
+```
+
