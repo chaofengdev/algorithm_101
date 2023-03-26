@@ -3746,3 +3746,103 @@ public class Solution {
 }
 ```
 
+#### 滑动窗口的最大值 *
+
+方法1：暴力求解
+
+> 暴力求解，两层循环，第一层为窗口的起点，第二层为窗口的长度，即遍历了所有窗口的每个位置。
+>
+> - step 1：第一次遍历数组每个位置作为窗口的起点。
+> - step 2：从每个起点开始遍历窗口长度，查找其中的最大值。
+
+```java
+import java.util.*;
+public class Solution {
+    public ArrayList<Integer> maxInWindows(int [] num, int size) {
+        ArrayList<Integer> res = new ArrayList<>();
+        if(size == 0 || size > num.length) return res;
+        for(int i = 0; i < num.length - size + 1; i++) {//注意越界
+            int max = Integer.MIN_VALUE;
+            for(int j = i; j < i + size; j++) {
+                max = Math.max(max, num[j]);
+            }
+            res.add(max);
+        }
+        return res;
+    }
+}
+```
+
+方法2：单调队列
+
+参考：https://leetcode.cn/problems/sliding-window-maximum/solution/dong-hua-yan-shi-dan-diao-dui-lie-239hua-hc5u/
+
+言简意赅，并且解答的代码也充满了艺术性。
+
+```java
+import java.util.*;
+public class Solution {
+    public ArrayList<Integer> maxInWindows(int [] num, int size) {
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        if(size == 0) return res;
+        ArrayDeque<Integer> queue = new ArrayDeque<>();//双端队列，存数组下标
+        for(int right = 0; right < num.length; right++) {
+            while(!queue.isEmpty() && num[queue.peekLast()] <= num[right]) {
+                queue.pollLast();
+            }
+            queue.addLast(right);
+            int left = right - size + 1;//滑动窗口左边界
+            if(queue.peekFirst() < left) {//队列首的元素不在滑动窗口内
+                queue.pollFirst();
+            }
+            if(right + 1 >= size) {//窗口形成
+                res.add(num[queue.peekFirst()]);//单调队列
+            }
+        }
+        return res;
+    }
+}
+```
+
+然后这种代码很难第一次就想到，下面这个更容易想到，本质是一样的。
+
+明天再补。这是leetcode上官方解答。
+
+```java
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        //模拟单调队列
+        Deque<Integer> deque = new ArrayDeque<>();
+        //结果数组
+        int[] res = new int[nums.length - k + 1];
+        //处理第一个窗口
+        for(int i = 0; i < k; i++){
+            while(!deque.isEmpty() && nums[i] > deque.peekLast()){
+                deque.pollLast();
+            }
+            deque.offerLast(nums[i]);
+        }
+        //定义res指针，并更新res
+        int index = 0;
+        res[index] = deque.peekFirst();
+        index++;
+        //处理接下来的窗口(本题逻辑重点，主要是画图理解过程)
+        for(int j = k; j < nums.length; j++){
+            //窗口第一个元素等于队头元素，因为窗口滑动，此时要进行出队操作
+            if(!deque.isEmpty() && deque.peekFirst() == nums[j - k]){
+                deque.pollFirst();
+            }
+            //和处理第一个窗口类似，如果更大，就将队列中小的出队；如果更小，就直接入队（本题核心）
+            while(!deque.isEmpty() && nums[j] > deque.peekLast()){
+                deque.pollLast();
+            }
+            deque.offerLast(nums[j]);
+            res[index] = deque.peekFirst();
+            index++;
+        }
+        //返回结果
+        return res;
+    }
+}
+```
+
