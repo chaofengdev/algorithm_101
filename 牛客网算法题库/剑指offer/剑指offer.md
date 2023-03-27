@@ -3846,3 +3846,34 @@ class Solution {
 }
 ```
 
+补充的leetcode解答牛客版本，其实理解了还是很简单的。
+
+```java
+import java.util.*;
+public class Solution {
+    public ArrayList<Integer> maxInWindows(int [] num, int size) {
+        ArrayDeque<Integer> queue = new ArrayDeque<Integer>();//保存元素值
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        if(size == 0 || num.length < size) return res;
+        for(int right = 0; right < size; right++) {//[0,size-1]
+            while(!queue.isEmpty() && num[right] >= queue.peekLast()) {
+                queue.pollLast();
+            }
+            queue.offerLast(num[right]);
+        }
+        res.add(queue.peekFirst());//这里不要忘记了。
+        for(int right = size; right < num.length; right++) {//[size,num.length-1]
+            if(!queue.isEmpty() && num[right - size] == queue.peekFirst()) {
+                queue.pollFirst();
+            }
+            while(!queue.isEmpty() && num[right] >= queue.peekLast()) {
+                queue.pollLast();
+            }
+            queue.offerLast(num[right]);
+            res.add(queue.peekFirst());
+        }
+        return res;
+    }
+}
+```
+
