@@ -3877,3 +3877,23 @@ public class Solution {
 }
 ```
 
+## 搜索算法
+
+#### 数字在升序数组中出现的次数
+
+方法1：暴力
+
+```java
+public class Solution {
+    public int GetNumberOfK(int [] array , int k) {
+        int res = 0;
+        for(int i = 0; i < array.length; i++) {
+            if(array[i] == k) {
+                res++;
+            }
+        }
+       return res;
+    }
+}
+```
+
