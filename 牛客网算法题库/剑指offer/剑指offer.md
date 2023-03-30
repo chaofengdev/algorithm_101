@@ -3897,3 +3897,31 @@ public class Solution {
 }
 ```
 
+方法2：二分
+
+```java
+
+```
+
+#### 二维数组中的查找
+
+```java
+public class Solution {
+    public boolean Find(int target, int [][] array) {
+        //核心思路：从左下开始找，小于target则向上找，大于target则向下找
+        int row = array.length;//行数
+        int col = array[0].length;//列数
+        for(int i = row - 1, j = 0; i >= 0 && j <= col - 1; ) {//这里的for循环写法比较特殊
+            if(array[i][j] > target) {
+                i--;//向上一行
+            }else if(array[i][j] < target) {
+                j++;//向右一行
+            }else if(array[i][j] == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
