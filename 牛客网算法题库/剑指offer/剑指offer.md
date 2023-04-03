@@ -3899,9 +3899,62 @@ public class Solution {
 
 方法2：二分
 
+> 二分是老大难了，看起来简单但是边界条件真的很难处理。
+>
+> 一个通用的方法是五点七边的模板：https://www.youtube.com/watch?v=JuDAqNyTG4g&t=754s
+>
+> 解答本题完全可以用到，但显然不是特别美观。
+
+![image-20230403165738906](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230403165738906.png)
+
+```java
+public class Solution {
+    public int GetNumberOfK(int [] array, int k) {
+        if (array.length == 0) return 0;
+        int left_index = binarySearch(array, k);
+        //System.out.println(left_index);
+        int right_index = binarySearch2(array, k);
+        //System.out.println(right_index);
+        return right_index - left_index + 1;
+    }
+    //二分查找：第一个等于target的元素下标
+    public int binarySearch(int[] array, int target) {
+        int left = -1;
+        int right = array.length;
+        while (left + 1 < right) { //left + 1 == right退出循环
+            int mid = (right - left) / 2 + left;
+            if (array[mid] < target) { //isBlue()
+                left = mid;
+            } else {
+                right = mid;
+            }
+        }
+        return right;
+    }
+    //二分查找：最后一个等于target的元素下标
+    public int binarySearch2(int[] array, int target) {
+        int left = -1;
+        int right = array.length;
+        while (left + 1 < right) { //left + 1 == right退出循环
+            int mid = (right - left) / 2 + left;//isBlue()
+            if (array[mid] <= target) {
+                left = mid;
+            } else {
+                right = mid;
+            }
+        }
+        return left;
+    }
+}
+```
+
+显然二分查找还有其他更加优雅的写法。
+
 ```java
 
 ```
+
+
 
 #### 二维数组中的查找
 
