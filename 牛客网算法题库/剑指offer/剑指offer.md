@@ -3905,18 +3905,53 @@ public class Solution {
 
 #### 二维数组中的查找
 
+> 首先看四个角，左上与右下必定为最小值与最大值，而左下与右上就有规律了：**左下元素大于它上方的元素，小于它右方的元素，右上元素与之相反**。既然左下角元素有这么一种规律，相当于将要查找的部分分成了一个大区间和小区间，每次与左下角元素比较，我们就知道目标值应该在哪部分中，于是可以利用分治思维来做。
+
+![图片说明](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/81B83FAE4B34DCEFE9C1EB670AE1CCB0)
+
 ```java
 public class Solution {
     public boolean Find(int target, int [][] array) {
-        //核心思路：从左下开始找，小于target则向上找，大于target则向下找
-        int row = array.length;//行数
-        int col = array[0].length;//列数
-        for(int i = row - 1, j = 0; i >= 0 && j <= col - 1; ) {//这里的for循环写法比较特殊
-            if(array[i][j] > target) {
-                i--;//向上一行
-            }else if(array[i][j] < target) {
-                j++;//向右一行
-            }else if(array[i][j] == target) {
+        //行列数
+        int row = array.length;
+        int col = array[0].length;
+        //特例
+        if (row == 0) return false;
+        //从左下角开始遍历--本题关键
+        for (int i = row - 1, j = 0; i >= 0 &&
+                j <= col - 1; ) { //没有“迭代因子”
+            if (target > array[i][j]) {
+                j++;
+            } else if (target < array[i][j]) {
+                i--;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+其实这种情况用for挺别扭的，应该是用while更好一些。
+
+```java
+public class Solution {
+    public boolean Find(int target, int [][] array) {
+        //行列数
+        int row = array.length;
+        int col = array[0].length;
+        //特例
+        if (row == 0) return false;
+        //从左下角开始遍历--本题关键
+        int row_index = row - 1;
+        int col_index = 0;
+        while(row_index >= 0 && col_index <= col - 1) {
+            if (target > array[row_index][col_index]) {
+                col_index++;
+            } else if (target < array[row_index][col_index]) {
+                row_index--;
+            } else {
                 return true;
             }
         }
