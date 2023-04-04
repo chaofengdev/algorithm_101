@@ -4032,3 +4032,47 @@ public class Solution {
 }
 ```
 
+#### 旋转数组的最小数字
+
+方法1：二分搜索
+
+```java
+public class Solution {
+    public int GetNumberOfK(int [] array, int k) {
+        if (array.length == 0) return 0;   
+        return binarySearch(array, k + 0.5) - binarySearch(array, k - 0.5);
+    }
+    //二分查找：left指向小于target区间最右，right指向大于等于target区间最左
+    public int binarySearch(int[] array, double target) {//double target
+        int left = -1;
+        int right = array.length;
+        while (left + 1 < right) { //left + 1 == right退出循环
+            int mid = (right - left) / 2 + left;
+            if (array[mid] < target) { //isBlue()
+                left = mid;
+            } else {
+                right = mid;
+            }
+        }
+        return right;
+    }
+}
+```
+
+方法2：遍历
+
+```java
+import java.util.*;
+public class Solution {
+    public int minNumberInRotateArray(int [] array) {
+        //数组一定有元素
+        int res = array[0]; 
+        //遍历数组
+        for(int i = 1; i < array.length; i++) 
+            //每次维护最小值
+            res = Math.min(res, array[i]); 
+        return res;
+    }
+}
+```
+
