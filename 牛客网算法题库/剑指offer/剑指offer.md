@@ -3879,7 +3879,7 @@ public class Solution {
 
 ## 搜索算法
 
-#### 数字在升序数组中出现的次数
+#### 数字在升序数组中出现的次数 *
 
 方法1：暴力
 
@@ -3951,7 +3951,26 @@ public class Solution {
 显然二分查找还有其他更加优雅的写法。
 
 ```java
-
+public class Solution {
+    public int GetNumberOfK(int [] array, int k) {
+        if (array.length == 0) return 0;   
+        return binarySearch(array, k + 0.5) - binarySearch(array, k - 0.5);
+    }
+    //二分查找：left指向小于target区间最右，right指向大于等于target区间最左
+    public int binarySearch(int[] array, double target) {//double target
+        int left = -1;
+        int right = array.length;
+        while (left + 1 < right) { //left + 1 == right退出循环
+            int mid = (right - left) / 2 + left;
+            if (array[mid] < target) { //isBlue()
+                left = mid;
+            } else {
+                right = mid;
+            }
+        }
+        return right;
+    }
+}
 ```
 
 
