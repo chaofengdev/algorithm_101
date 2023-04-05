@@ -4076,3 +4076,48 @@ public class Solution {
 }
 ```
 
+#### 字符串的排列
+
+方法1：深度优先遍历+回溯
+
+```java
+import java.util.*;
+public class Solution {
+    ArrayList<String> res = new ArrayList<>();//返回结果
+    public ArrayList<String> Permutation(String str) {
+        char[] charArr = str.toCharArray();//将字符串转char数组
+        Arrays.sort(charArr);//排序后重复的字符就会相邻，剪枝必须先排序
+        ArrayList<Character> path = new ArrayList<>();//保存一种排列
+        boolean[] visited = new boolean[charArr.length];//判断某个字符是否被访问过
+        dfs(charArr, path, visited); //深度优先遍历
+        return res;
+    }
+    public void dfs(char[] charArr, ArrayList<Character> path, boolean[] visited) {
+        if (path.size() == charArr.length) {
+            //字符集合转字符串
+            String str = "";
+            for(char ch : path) {
+                str = str + Character.toString(ch);
+            }
+            res.add(str);
+            return;//找到一条路径，直接返回
+        }
+        for (int i = 0; i < charArr.length; i++) {
+            if(i > 0 && charArr[i] == charArr[i - 1] && !visited[i - 1]) {//前一个字符访问过且与现字符相等，本质上是剪枝操作，这里务必要理解本质，自己的错误是写成!visited[i]
+                continue;//直接跳过该字符
+            }
+            if (visited[i]) { //该字符已经被访问过
+                continue;
+            }
+            visited[i] = true;
+            path.add(charArr[i]);//将字符加进排列路径
+            dfs(charArr,path,visited);//从剩下的字符中找适合添加进排列路径的字符
+            //回溯，表示这个字符不在排列路径中，下次仍然可以再将字符添加进排列路径
+            visited[i] = false;
+            path.remove(path.size()-1);
+        }
+    }
+
+}
+```
+
