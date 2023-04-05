@@ -4080,44 +4080,162 @@ public class Solution {
 
 方法1：深度优先遍历+回溯
 
+![image.png](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/1600386643-uhkGmW-image.png)
+
 ```java
 import java.util.*;
 public class Solution {
-    ArrayList<String> res = new ArrayList<>();//返回结果
+    //结果集合
+    ArrayList<String> res = new ArrayList<>();
     public ArrayList<String> Permutation(String str) {
-        char[] charArr = str.toCharArray();//将字符串转char数组
-        Arrays.sort(charArr);//排序后重复的字符就会相邻，剪枝必须先排序
-        ArrayList<Character> path = new ArrayList<>();//保存一种排列
-        boolean[] visited = new boolean[charArr.length];//判断某个字符是否被访问过
-        dfs(charArr, path, visited); //深度优先遍历
+        //字符串转字符数组
+        char[] chArr = str.toCharArray();
+        //保存路径
+        ArrayList<Character> path = new ArrayList<>();
+        //标记元素是否访问过
+        boolean[] used = new boolean[chArr.length];
+        //排序，便于剪枝
+        Arrays.sort(chArr);
+        //深度优先遍历
+        dfs(chArr, path, used);
+        //返回结果集合
         return res;
     }
-    public void dfs(char[] charArr, ArrayList<Character> path, boolean[] visited) {
-        if (path.size() == charArr.length) {
-            //字符集合转字符串
+    //深度优先遍历
+    public void dfs(char[] chArr, ArrayList<Character> path, boolean[] used) {
+        //递归出口
+        if (chArr.length == path.size()) {
+            //将字符连接成字符串
             String str = "";
-            for(char ch : path) {
-                str = str + Character.toString(ch);
+            for (char ch : path) {
+                str += ch;
             }
+            //添加到结果集合
             res.add(str);
-            return;//找到一条路径，直接返回
+            return;//可以不加
         }
-        for (int i = 0; i < charArr.length; i++) {
-            if(i > 0 && charArr[i] == charArr[i - 1] && !visited[i - 1]) {//前一个字符访问过且与现字符相等，本质上是剪枝操作，这里务必要理解本质，自己的错误是写成!visited[i]
-                continue;//直接跳过该字符
-            }
-            if (visited[i]) { //该字符已经被访问过
+        //遍历数组
+        for (int i = 0; i < chArr.length; i++) {
+            //元素已经被访问过
+            if (used[i]) {
                 continue;
             }
-            visited[i] = true;
-            path.add(charArr[i]);//将字符加进排列路径
-            dfs(charArr,path,visited);//从剩下的字符中找适合添加进排列路径的字符
-            //回溯，表示这个字符不在排列路径中，下次仍然可以再将字符添加进排列路径
-            visited[i] = false;
-            path.remove(path.size()-1);
+            //剪枝
+            if(i >= 1 && chArr[i] == chArr[i - 1] && !used[i - 1]) {//剪枝条件
+                continue;
+            }
+            //状态变量
+            used[i] = true;
+            path.add(chArr[i]);
+            //递归
+            dfs(chArr, path, used);
+            //回溯
+            used[i] = false;
+            path.remove(path.size() - 1);
         }
     }
+}
+```
 
+附上leetcode的全排列Ⅱ解答：
+
+这里dfs传入3个参数，其中path可以提出来成为全局变量，效果一样；
+
+这里比牛客的简单一些，因为不需要处理字符串，直接使用数组即可。
+
+```java
+class Solution {
+    //结果集合
+    List<List<Integer>> res = new ArrayList<>();
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        //记录每个结果
+        List<Integer> path = new ArrayList<>();
+        //标记已访问的元素
+        boolean[] visited = new boolean[nums.length];//默认是false
+        //数组排序，便于剪枝
+        Arrays.sort(nums);
+        //深度优先遍历
+        dfs(nums, path, visited);
+        //返回结果
+        return res;
+    }
+    public void dfs(int[] nums, List<Integer> path, boolean[] visited) {
+        //递归出口
+        if(nums.length == path.size()) {
+            res.add(new ArrayList(path));
+            return;
+        }
+        //本级任务
+        for(int i = 0; i < nums.length; i++) {
+            //当前元素已经被访问过，直接检查下一个元素
+            if(visited[i]) {
+                continue;
+            }
+            //剪枝
+            if(i >= 1 && nums[i] == nums[i - 1] && !visited[i - 1]) {//剪枝条件：当前元素与上一个元素相同，且上一个元素刚刚被撤销选择。例子[1,1,2]。
+                continue;
+            }
+            //将当前元素加入路径
+            path.add(nums[i]);
+            //标记当前元素为已访问
+            visited[i] = true;
+            //递归遍历剩余元素
+            dfs(nums, path, visited);
+            //回溯，撤销刚刚的选择
+            path.remove(path.size() - 1);
+            visited[i] = false;
+        }
+        
+    }
+}
+```
+
+甚至可以适当简化一下dfs参数。
+
+```java
+class Solution {
+    //结果集合
+    List<List<Integer>> res = new ArrayList<>();
+    //记录每个结果
+    List<Integer> path = new ArrayList<>();
+    //标记已访问的元素
+    boolean[] visited = new boolean[8];//默认是false
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        //数组排序，便于剪枝
+        Arrays.sort(nums);
+        //深度优先遍历
+        dfs(nums);
+        //返回结果
+        return res;
+    }
+    public void dfs(int[] nums) {
+        //递归出口
+        if(nums.length == path.size()) {
+            res.add(new ArrayList(path));
+            return;
+        }
+        //本级任务
+        for(int i = 0; i < nums.length; i++) {
+            //当前元素已经被访问过，直接检查下一个元素
+            if(visited[i]) {
+                continue;
+            }
+            //剪枝
+            if(i >= 1 && nums[i] == nums[i - 1] && !visited[i - 1]) {//剪枝条件：当前元素与上一个元素相同，且上一个元素刚刚被撤销选择。例子[1,1,2]。
+                continue;
+            }
+            //将当前元素加入路径
+            path.add(nums[i]);
+            //标记当前元素为已访问
+            visited[i] = true;
+            //递归遍历剩余元素
+            dfs(nums);
+            //回溯，撤销刚刚的选择
+            path.remove(path.size() - 1);
+            visited[i] = false;
+        }
+        
+    }
 }
 ```
 
