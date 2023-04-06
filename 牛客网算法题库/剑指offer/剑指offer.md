@@ -4243,6 +4243,8 @@ public class Solution {
 
 方法2：位数相减
 
+![image-20230406172752069](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230406172752069.png)
+
 ```java
 import java.util.*;
 
