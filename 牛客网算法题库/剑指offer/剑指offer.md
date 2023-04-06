@@ -4207,7 +4207,7 @@ class Solution {
 
 #### 数字序列中某一位的数字
 
-这题很有意思，但是貌似和堆栈没太大关系。
+方法1：添0补齐
 
 > - step 1：使用循环求n是属于几位数，i从1位数开始，每次给它增加10^i个0，即n位数往后推10^i。
 > - step 2：找到目标数字后，通过数字对位数求除法找到该数字，转化为字符串类型。
@@ -4240,3 +4240,48 @@ public class Solution {
     }
 }
 ```
+
+方法2：位数相减
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     *
+     * @param n int整型
+     * @return int整型
+     */
+    public int findNthDigit (int n) {
+        // write code here
+        //记录是几位数字
+        int digit = 1;
+        //记录当前区间的起始数字：1，10，100，1000...
+        long start = 1;
+        //记录当前区间之前一共有多少位数字
+        long sum = 9;//初始化为9的原因
+        //定位n在哪个区间上
+        while (n > sum) { //n <= sum 退出循环
+            n = (int)(n - sum);//注意类型转换
+            start = start * 10;
+            digit++;
+            //该区间的总位数
+            sum = 9 * digit * start;
+        }
+        //定位n在哪个数字上
+        String num_str = "" + (start + (n - 1) / digit);
+        //定位n在数字的哪一位上
+        int index = (n - 1) % digit;
+        //返回数字
+        return (int)(num_str.charAt(index)) - (int)('0');
+    }
+}
+```
+
+## 动态规划
+
+#### 连续子数组的最大和
+
