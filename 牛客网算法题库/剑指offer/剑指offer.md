@@ -4285,12 +4285,48 @@ public class Solution {
 
 ## 动态规划
 
-#### 连续子数组的最大和
+#### 连续子数组的最大和 *
 
-方法1：暴力求解
+方法1：暴力求解--均超时
+
+时间复杂度为O(n^3)的解法：超时
 
 ```java
+public class Solution {
+    public int FindGreatestSumOfSubArray(int[] nums) {
+        int max = Integer.MIN_VALUE;//求最大值的一般初值都是这个
+        //int sum = 0;
+        for(int i = 0; i < nums.length; i++) {
+            for(int j = i; j < nums.length; j++) {
+                int sum = 0;//计算sum(i,j)
+                for(int k = i; k <= j; k++) {
+                    sum += nums[k];
+                }
+                max = Math.max(max, sum);
+            }
+        }
+        return max;
+    }
+}
+```
 
+时间复杂度为O(n^2)的解法：超时
+
+```java
+public class Solution {
+    public int FindGreatestSumOfSubArray(int[] nums) {
+        int max = Integer.MIN_VALUE;//求最大值的一般初值都是这个
+        //int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int sum = 0;//sum(i,j)=sum(i,j-1)+nums[j];
+            for (int j = i; j < nums.length; j++) {
+                sum += nums[j];
+                max = Math.max(max, sum);
+            }
+        }
+        return max;
+    }
+}
 ```
 
 方法2：动态规划
