@@ -4287,18 +4287,63 @@ public class Solution {
 
 #### 连续子数组的最大和
 
+方法1：暴力求解
+
 ```java
-public int FindGreatestSumOfSubArray(int[] array) {
-        int[] dp = new int[array.length];
-        int max = array[0];
-        dp[0] = array[0];
-        for(int i=1;i<array.length;i++){
-            // 动态规划，状态转移方程，确定dp[i]的最大值
-            dp[i] = Math.max(dp[i-1] + array[i], array[i]);
-            // 每次比较，保存出现的最大值
+
+```
+
+方法2：动态规划
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        //定义最大和
+        int max = nums[0];
+        //dp表示以nums[i]为结尾的连续子数组的最大和
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        for(int i = 1; i < nums.length; i++) {
+            if(dp[i - 1] < 0) {
+                dp[i] = nums[i];
+            }else {
+                dp[i] = dp[i - 1] + nums[i];
+            }
             max = Math.max(max,dp[i]);
         }
         return max;
     }
+}
+```
+
+简化一下写法：
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        //定义最大和
+        int max = nums[0];
+        //dp表示以nums[i]为结尾的连续子数组的最大和
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        for(int i = 1; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i - 1] + nums[i], nums[i]);
+            max = Math.max(max,dp[i]);
+        }
+        return max;
+    }
+}
+```
+
+方法3：动态规划优化
+
+```java
+
+```
+
+贪心
+
+```java
+
 ```
 
