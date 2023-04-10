@@ -4374,12 +4374,16 @@ class Solution {
 方法3：动态规划优化
 
 ```java
-
-```
-
-贪心
-
-```java
-
+public int FindGreatestSumOfSubArray(int[] array) {
+        int sum = 0;
+        int max = array[0];
+        for(int i=0;i<array.length;i++){
+            // 优化动态规划，确定sum的最大值
+            sum = Math.max(sum + array[i], array[i]);
+            // 每次比较，保存出现的最大值
+            max = Math.max(max,sum);
+        }
+        return max;
+}
 ```
 
