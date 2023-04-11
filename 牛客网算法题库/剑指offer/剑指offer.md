@@ -4387,3 +4387,7 @@ public int FindGreatestSumOfSubArray(int[] array) {
 }
 ```
 
+#### 连续子数组的最大和（二）*
+
+
+
