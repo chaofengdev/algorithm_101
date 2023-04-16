@@ -4414,5 +4414,57 @@ public int FindGreatestSumOfSubArray(int[] array) {
 
 #### 连续子数组的最大和（二）*
 
+这题要求不光求出最大和，并且要求输出最大数组，并且要求数组长度最长。
 
+直观上感觉这题要用滑动窗口，实际上还是动态规划。
+
+方法1：动态规划
+
+> 每次用left、right记录当前子数组的区间，需要更新最大值时，更新最终的区间首尾，这样我们的区间长度就是最长的。
+>
+> - step 1：创建动态规划辅助数组，记录到下标i为止的最大连续子数组和，下标为0的时候，肯定等于原数组下标为0的元素。
+> - step 2：准备左右区间双指针记录每次连续子数组的首尾，再准备两个双指针记录最大和且区间最长的连续子数组的首尾。
+> - step 3：遍历数组，对于每个元素用上述状态转移公式记录其dp值，更新区间首尾（如果需要）。
+> - step 4：出现一个最大值。且区间长度更大的时候，更新记录最长区间的双指针。
+> - step 5：根据记录的最长子数组的位置取数组。
+
+![alt](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/83C9DB1D7BB98AFD16716153916EAC03)
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param array int整型一维数组 
+     * @return int整型一维数组
+     */
+    public int[] FindGreatestSumOfSubArray (int[] array) {
+        // write code here
+        int left = 0, right = 0;//滑动区间
+        int resl = 0, resr = 0;//最长区间
+        int[] dp = new int[array.length];
+        dp[0] = array[0];
+        int max = array[0];
+        int sum = array[0];
+        for(int i = 1; i < array.length; i++) {
+            right++;
+            dp[i] = Math.max(dp[i - 1] + array[i], array[i]);
+            if(dp[i - 1] < 0) {
+                left = i;//更新left
+            }
+            if(dp[i] > max || dp[i] == max && (right - left + 1) > (resr - resl + 1)) {//更新最长区间
+                resl = left;
+                resr = right;
+                max = dp[i];
+            }
+        }
+        int[] res = Arrays.copyOfRange(array,resl,resr + 1);
+        return res;
+    }
+}
+```
 
