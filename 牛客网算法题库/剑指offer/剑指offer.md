@@ -4468,3 +4468,92 @@ public class Solution {
 }
 ```
 
+方法2：动态规划空间优化
+
+> sum表示dp[i-1]，更新之后是dp[i]
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param array int整型一维数组 
+     * @return int整型一维数组
+     */
+    public int[] FindGreatestSumOfSubArray (int[] array) {
+        // write code here
+        int left = 0, right = 0;//滑动区间
+        int resl = 0, resr = 0;//最长区间
+        //int[] dp = new int[array.length];
+        //dp[0] = array[0];
+        int max = array[0];
+        int sum = array[0];
+        for(int i = 1; i < array.length; i++) {
+            right++;
+            if(sum < 0) {
+                left = i;//更新left
+            }
+            sum = Math.max(sum + array[i], array[i]);
+            
+            if(sum > max || sum == max && (right - left + 1) > (resr - resl + 1)) {//更新最长区间
+                resl = left;
+                resr = right;
+                max = sum;
+            }
+        }
+        int[] res = Arrays.copyOfRange(array,resl,resr + 1);
+        return res;
+    }
+}
+```
+
+> 当然可以用两个变量表示dp[i-1]和dp[i]；
+>
+> 用sum_1表示dp[i-1]，用sum_2表示dp[i]，则每次更新sum_2，并且最后将sum_1更新为sum_2；
+>
+> 这里sum_2只是起到一个临时变量的作用。
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     * 
+     * @param array int整型一维数组 
+     * @return int整型一维数组
+     */
+    public int[] FindGreatestSumOfSubArray (int[] array) {
+        // write code here
+        int left = 0, right = 0;//滑动区间
+        int resl = 0, resr = 0;//最长区间
+        //int[] dp = new int[array.length];
+        //dp[0] = array[0];
+        int max = array[0];
+        int sum_1 = array[0];//dp[i - 1]
+        int sum_2 = 0;//dp[i]，还未计算暂时为0
+        for(int i = 1; i < array.length; i++) {
+            right++;
+            sum_2 = Math.max(sum_1 + array[i], array[i]);
+            if(sum_1 < 0) {
+                left = i;//更新left
+            }
+            if(sum_2 > max || sum_2 == max && (right - left + 1) > (resr - resl + 1)) {//更新最长区间
+                resl = left;
+                resr = right;
+                max = sum_2;
+            }
+            sum_1 = sum_2;//更新sum_1，sum_2只是辅助变量，表示当前dp[i]大小
+        }
+        int[] res = Arrays.copyOfRange(array,resl,resr + 1);
+        return res;
+    }
+}
+```
+
