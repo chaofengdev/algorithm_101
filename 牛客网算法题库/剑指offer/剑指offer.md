@@ -4373,6 +4373,31 @@ class Solution {
 
 方法3：动态规划优化
 
+我的写法：
+
+```java
+public class Solution {
+    public int FindGreatestSumOfSubArray(int[] array) {
+        int max = array[0];
+        int sum = array[0];//sum表示dp[i-1]大小，本质上根据dp[i-1]大小判断dp[i]大小
+        //int[] dp = new int[array.length];
+        //dp[0] = array[0];
+        for(int i = 1; i < array.length; i++) {
+            if(sum < 0) {
+                sum = array[i];
+            }else {
+                sum = sum + array[i];
+            }
+            max = Math.max(max, sum);
+        }
+        return max;
+    }
+}
+
+```
+
+换一个解答：
+
 ```java
 public int FindGreatestSumOfSubArray(int[] array) {
         int sum = 0;
