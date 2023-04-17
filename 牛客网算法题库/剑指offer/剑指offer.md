@@ -4654,3 +4654,80 @@ public class Solution {
 }
 ```
 
+#### 正则表达式匹配
+
+二刷发现还是一团浆糊。
+
+```java
+import java.util.*;
+
+
+public class Solution {
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     *
+     *
+     * @param str string字符串
+     * @param pattern string字符串
+     * @return bool布尔型
+     */
+    public boolean match (String str, String pattern) {
+        // write code here
+        int n1 = str.length();
+        int n2 = pattern.length();
+        //dp[i][j]为true表示str的前i个字符与pattern的前j个字符相匹配
+        boolean[][] dp = new boolean[n1 + 1][n2 + 1];
+        //遍历str的长度
+        for (int i = 0; i <= n1; i++) {
+            //遍历pattern的长度
+            for (int j = 0; j <= n2; j++) {
+                if (j == 0) { //空pattern的情况
+                    dp[i][j] = (i == 0) ? true : false;//初始条件
+                } else {
+                    //没有遇到*的情况
+                    if ((i >= 1 && j >= 1) && (str.charAt(i - 1) == pattern.charAt(j - 1) ||
+                                               pattern.charAt(j - 1) ==
+                                               '.')) {//两个字符相等或pattern用.匹配任意一个字符
+                        dp[i][j] = dp[i - 1][j - 1];
+                    } else {//剩下的是遇到*的情况（比较复杂，本题难点）
+                        if (j >= 2) { //无论是否匹配，都可以将a*匹配原字符0次
+                            dp[i][j] = dp[i][j - 2];
+                            if ((i >= 1 && j >= 2) && (pattern.charAt(j - 2) == '.' ||
+                                                       str.charAt(i - 1) == pattern.charAt(j - 2))) {//能匹配，表示多个字符[abc][abc*]||[abcc][abc*] [abc][ab.*]||[abc][abc.*]
+                                dp[i][j] = dp[i - 1][j] || dp[i][j - 2];//pattern为.*或者为a*
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        return dp[n1][n2];
+
+    }
+}
+```
+
+#### 青蛙跳台阶扩展问题
+
+方法：找规律。
+
+我表示真的好怪。
+
+![image-20230417175857563](https://typora-1256823886.cos.ap-nanjing.myqcloud.com/2022/image-20230417175857563.png)
+
+```java
+public class Solution {
+    public int jumpFloorII(int target) {
+        int[] dp = new int[target + 1];
+        //初始化前面两个
+        dp[0] = 1;
+        dp[1] = 1;
+        //依次乘2
+        for (int i = 2; i <= target; i++)
+            dp[i] = 2 * dp[i - 1];
+        return dp[target];
+    }
+}
+```
+
