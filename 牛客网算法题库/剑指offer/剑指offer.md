@@ -4557,3 +4557,100 @@ public class Solution {
 }
 ```
 
+#### 青蛙跳台阶
+
+方法1：递归
+
+方法2：动态规划
+
+```java
+public class Solution {
+    public int jumpFloor(int target) {
+        int[] dp = new int[target + 1];
+        dp[0] = 0;
+        dp[1] = 1;
+        if(target == 0 || target == 1) return dp[target];
+        dp[2] = 2;
+        for(int i = 3; i < target + 1; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[target];
+    }
+}
+```
+
+上面的稍微有点错漏，导致需要特殊判断。
+
+```java
+public class Solution {
+    public int jumpFloor(int target) {
+        int[] dp = new int[target + 1];
+        dp[0] = 1;//这里应该是1，不是0
+        dp[1] = 1;
+        //dp[2] = 2;
+        for(int i = 2; i < target + 1; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[target];
+    }
+}
+```
+
+优化了一下空间。
+
+```java
+public class Solution {
+    public int jumpFloor(int target) {
+        //int[] dp = new int[target + 1];
+        int x = 1;
+        int y = 1;
+        for(int i = 2; i < target + 1; i++) {
+            int temp = x + y;
+            x = y;
+            y = temp;
+        }
+        return y;
+    }
+}
+```
+
+#### 斐波那契数列
+
+方法1：动态规划
+
+```java
+public class Solution {
+    public int Fibonacci(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 1;
+        for(int i = 3; i < n + 1; i++) {
+            dp[i] = dp[i - 2] + dp[i - 1];
+        }
+        return dp[n];
+    }
+}
+```
+
+优化空间。
+
+```java
+public class Solution {
+    public int Fibonacci(int n) {
+        //int[] dp = new int[n + 1];
+        //dp[0] = 0;
+        //dp[1] = 1;
+        //dp[2] = 1;
+        int x = 1;
+        int y = 1;
+        for(int i = 3; i < n + 1; i++) {
+            int temp = x + y;
+            x = y;
+            y = temp;
+        }
+        return y;
+    }
+}
+```
+
