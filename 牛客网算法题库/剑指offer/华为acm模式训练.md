@@ -170,3 +170,188 @@ public class Main {
 }
 ```
 
+## 字符串分隔
+
+方法1：借助substring()
+
+> 1. 需要输入字符串，用到Scanner和hasNext()。
+>    （1）建立 Scanner sc = new Scanner(System.in);
+>    （2）判断有无输入用sc.hasNext().接收字符串使用sc.nextLine().
+> 2. 一次性接受全部的字符串，对8取余，获知需要补0的位数。使用StringBuilder中的append()函数进行字符串修改，别忘了toString()。
+>    字符串缓冲区的建立：StringBuilder sb = new StringBuilder();
+> 3. 输出时，截取前8位进行输出，并更新字符串。用到str.substring()函数：
+>    （1）str.substring(i)意为截取从字符索引第i位到末尾的字符串。
+>    （2）str.substring(i,j)意为截取索引第i位到第（j-1）位字符串。包含i，不包含j。
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()) {
+            String str = sc.nextLine();
+            //int size = str.length();
+            //需要补0的位数
+            int help = 8 - str.length()%8;
+            //建立字符串缓冲区
+            StringBuilder sb = new StringBuilder(str);
+            while(help > 0 && help < 8) {
+                sb.append("0");
+                help--;
+            }
+            //利用substring分割字符串
+            String temp = sb.toString();
+            while(temp.length() > 0) {
+                System.out.println(temp.substring(0,8));//截取从第0位到第7位字符串
+                temp = temp.substring(8);//截取从字符串第8位到末尾的字符串
+            }
+        }
+    }
+}
+```
+
+方法2：手动处理分割逻辑
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()) {
+            String str = sc.nextLine();
+            //需要补0的长度
+            int len = 8 - str.length()%8;
+            while(len > 0 && len < 8) {
+                str += "0";
+                len--;
+            }
+            //System.out.println(str);
+            //8个一组输出字符串
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < str.length(); i++) {
+                //int j = 0;
+                if(i > 0 && i % 8 == 0) {//i > 0
+                    System.out.println(sb.toString());
+                    sb.setLength(0);//清空缓冲区
+                }
+                sb.append(str.charAt(i));
+            }
+            // 输出最后一组剩余的字符
+            System.out.println(sb.toString());
+        }
+    }
+}
+```
+
+## 进制转换
+
+方法1：Integer.parseInt(str,16);
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()) {
+            String str = sc.nextLine();
+            String str_temp = str.substring(2,str.length());
+            int res = Integer.parseInt(str_temp,16);
+            System.out.println(res);
+        }
+    }
+}
+```
+
+方法2：Map集合
+
+> 注意java8新特性，双括号初始化
+
+```java
+import java.util.*;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public final static int BASE = 16;
+    public static Map<Character, Integer> map = new HashMap<Character, Integer>() {//java8新特性–双括号初始化
+        {
+            put('0', 0);
+            put('1', 1);
+            put('2', 2);
+            put('3', 3);
+            put('4', 4);
+            put('5', 5);
+            put('6', 6);
+            put('7', 7);
+            put('8', 8);
+            put('9', 9);
+            put('A', 10);
+            put('B', 11);
+            put('C', 12);
+            put('D', 13);
+            put('E', 14);
+            put('F', 15);
+            put('a', 10);
+            put('b', 11);
+            put('c', 12);
+            put('d', 13);
+            put('e', 14);
+            put('f', 15);
+        }
+    };
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            String str = sc.nextLine();
+            int res = getDecimal(str);
+            System.out.println(res);
+        }
+    }
+    public static int getDecimal(String number) {
+        int res = 0;
+        for (char ch : number.toCharArray()) {
+            res = res * BASE + map.get(ch);//本题核心
+        }
+        return res;
+    }
+}
+```
+
+方法3：通用方法
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        // 注意 hasNext 和 hasNextLine 的区别
+        while (sc.hasNext()) { // 注意 while 处理多个 case
+            String str = sc.nextLine();
+            int count = 0;
+            for(int i = 0; i < str.length() - 2; i++) {
+                char tc = str.charAt(i + 2);//由于前面两位是'0x'，故从第三位开始
+                int t = 0;//记录字母转换成的数值
+                //将字母转换成数字
+                if(tc >= '0' && tc <= '9') {
+                    t = tc - '0';
+                }else if(tc >= 'A' && tc <= 'F') {
+                    t = tc - 'A' + 10;
+                }else if(tc >= 'a' && tc <= 'f') {
+                    t = tc - 'a' + 10;
+                }
+                //计算加和
+                count = count * 16 + t;// count = count + t * Math.pow(16,s.length()-i-3);这个比较难想到
+            }
+            System.out.println(count);
+        }
+    }
+}
+```
+
