@@ -4731,3 +4731,48 @@ public class Solution {
 }
 ```
 
+#### 01背包问题
+
+方法1：动态规划
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        //读入物品数量和背包容量
+        int len = sc.nextInt();
+        int volume = sc.nextInt();
+        //存放体积和价值
+        int[] v = new int[len + 1];
+        int[] w = new int[len + 1];
+        for(int i = 1; i <= len; i++) {
+            v[i] = sc.nextInt();//第i件物品体积
+            w[i] = sc.nextInt();//第i件物品价值
+        }
+        //dp[i][j]：背包前i个物品可以存放，容量为j的情况下，获得的最大价值
+        int[][] dp = new int[len + 1][volume + 1];
+        //初始化
+        for(int i = 0; i < len + 1; i++) {
+            dp[i][0] = 0;
+        }
+        for(int j = 0; j < volume; j++) {
+            dp[0][j] = 0;
+        }
+        //状态转移
+        for(int i = 1; i < len + 1; i++) {//遍历到第i件物品
+            for(int j = 1; j < volume + 1; j++) {//当前背包容积为j
+                if(v[i] > j) {//当前物品体积大于背包剩余容积，只能选择放弃
+                    dp[i][j] = dp[i - 1][j];
+                }else {//当前物品体积小于背包剩余容积，可以选择装入并修改背包容积和价值，也可以选择放弃价值不变
+                    dp[i][j] = Math.max(dp[i - 1][j - v[i]] + w[i],dp[i - 1][j]);
+                }
+            }
+        }
+        System.out.println(dp[len][volume]);  
+    }
+}
+```
+

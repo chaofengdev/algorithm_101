@@ -1,4 +1,4 @@
-## 字符串最后一个单词的长度
+## HJ1 字符串最后一个单词的长度
 
 方法1：反过来打印
 
@@ -39,7 +39,7 @@ public class Main {
 }
 ```
 
-## 计算某字符出现次数
+## HJ2 计算某字符出现次数
 
 方法1：系统函数
 
@@ -82,7 +82,7 @@ public class Main {
 }
 ```
 
-## 明明的随机数
+## HJ3 明明的随机数
 
 方法1：利用TreeSet进行排序和去重
 
@@ -170,7 +170,7 @@ public class Main {
 }
 ```
 
-## 字符串分隔
+## HJ4 字符串分隔
 
 方法1：借助substring()
 
@@ -247,7 +247,7 @@ public class Main {
 }
 ```
 
-## 进制转换
+## HJ5 进制转换
 
 方法1：Integer.parseInt(str,16);
 
@@ -355,7 +355,7 @@ public class Main {
 }
 ```
 
-## 质数因子
+## HJ6 质数因子
 
 方法1：除法
 
@@ -381,7 +381,7 @@ public class Main {
 }
 ```
 
-## 取近似值
+## HJ7 取近似值
 
 方法1：暴力
 
@@ -423,7 +423,7 @@ public class Main {
 } 
 ```
 
-## 合并表记录
+## HJ8 合并表记录
 
 方法1：利用哈希表
 
@@ -491,7 +491,7 @@ public class Main {
 }
 ```
 
-## 提取不重复的整数
+## HJ9 提取不重复的整数
 
 方法1：利用整数除法性质和HashSet去重
 
@@ -543,7 +543,7 @@ public class Main {
 }
 ```
 
-## 字符个数统计
+## HJ10 字符个数统计
 
 方法1：利用HashSet去重
 
@@ -574,7 +574,7 @@ public class Main {
 
 方法2：位图 不要求掌握。
 
-## 数字颠倒
+## HJ11 数字颠倒
 
 ```java
 import java.util.Scanner;
@@ -589,7 +589,7 @@ public class Main {
 }
 ```
 
-## 字符串反转
+## HJ12 字符串反转
 
 ```java
 import java.util.Scanner;
@@ -609,7 +609,7 @@ public class Main {
 }
 ```
 
-## 句子逆序
+## HJ13 句子逆序
 
 ```java
 import java.util.*;
@@ -648,6 +648,96 @@ public class Main {
         for(int i = strArr.length - 1; i >= 0; i--) {
             System.out.print(strArr[i] + " ");
         }
+    }
+}
+```
+
+## HJ23 字符串排序
+
+> 1.nextInt()和next()、nextFloat()、nextDouble()都是只读取有效字符的，不会读取空格键、Tab键和回车键，当它在输入有效字符前碰到这些无效字符时会自动跳过，在输入有效字符后碰到时便结束读取，并把没能读取的字符留在缓冲区。
+>
+> 2.而nextLine()除了回车啥都能读取，也就是碰到回车时结束读取，但不会把回车留在缓冲区。
+
+```java
+import java.util.*;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int len = sc.nextInt();
+        String[] arr = new String[len];
+        for(int i = 0; i < len; i++) {
+            arr[i] = sc.next();
+        }
+        Arrays.sort(arr);
+        for(String str : arr) {
+            System.out.println(str);
+        }
+    }
+}
+```
+
+
+
+## HJ22 汽水瓶
+
+方法1：找规律
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNextInt()) {
+            int num = sc.nextInt();
+            if(num == 0) {
+                break;
+            }
+            System.out.println(num / 2);
+        }
+    }
+}
+```
+
+方法2：模拟
+
+> 讲真不是很难，但是为什么每次都要想很久。
+
+```java
+import java.util.Scanner;
+
+// 注意类名必须为 Main, 不要有任何 package xxx 信息
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNextInt()) {
+            int num = sc.nextInt();
+            if(num == 0) {
+                break;
+            }else {
+                countCola(num);
+            }
+            
+        }
+    }
+    //计算num个空瓶可以兑换多少瓶汽水
+    public static void countCola(int num) {
+        if(num == 1) System.out.println(0);
+        if(num == 2) System.out.println(1);
+        int count = 0;
+        while(num / 3 > 0) {
+            count = count + num / 3;
+            //还剩下多少个瓶盖
+            num = num / 3 + num % 3;
+            //可以向老板借一个
+            if(num == 2) {
+                num = num + 1;
+            }
+        }
+        System.out.println(count);
     }
 }
 ```
