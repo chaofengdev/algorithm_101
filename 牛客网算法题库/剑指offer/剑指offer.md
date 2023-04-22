@@ -4748,30 +4748,57 @@ public class Main {
         //存放体积和价值
         int[] v = new int[len + 1];
         int[] w = new int[len + 1];
-        for(int i = 1; i <= len; i++) {
+        for (int i = 1; i <= len; i++) {
             v[i] = sc.nextInt();//第i件物品体积
             w[i] = sc.nextInt();//第i件物品价值
         }
         //dp[i][j]：背包前i个物品可以存放，容量为j的情况下，获得的最大价值
         int[][] dp = new int[len + 1][volume + 1];
         //初始化
-        for(int i = 0; i < len + 1; i++) {
+        for (int i = 0; i < len + 1; i++) {
             dp[i][0] = 0;
         }
-        for(int j = 0; j < volume; j++) {
+        for (int j = 0; j < volume; j++) {
             dp[0][j] = 0;
         }
         //状态转移
-        for(int i = 1; i < len + 1; i++) {//遍历到第i件物品
-            for(int j = 1; j < volume + 1; j++) {//当前背包容积为j
-                if(v[i] > j) {//当前物品体积大于背包剩余容积，只能选择放弃
+        for (int i = 1; i < len + 1; i++) { //遍历到第i件物品
+            for (int j = 1; j < volume + 1; j++) { //当前背包容积为j
+                if (v[i] >
+                        j) { //当前物品体积大于背包剩余容积，只能选择放弃
                     dp[i][j] = dp[i - 1][j];
-                }else {//当前物品体积小于背包剩余容积，可以选择装入并修改背包容积和价值，也可以选择放弃价值不变
-                    dp[i][j] = Math.max(dp[i - 1][j - v[i]] + w[i],dp[i - 1][j]);
+                } else {//当前物品体积小于背包剩余容积，可以选择装入并修改背包容积和价值，也可以选择放弃价值不变
+                    dp[i][j] = Math.max(dp[i - 1][j - v[i]] + w[i], dp[i - 1][j]);
                 }
             }
         }
-        System.out.println(dp[len][volume]);  
+        System.out.println(dp[len][volume]);
+        //下面求背包恰好装满，至多能装多大价值的物品，注意这里不一定能够装满
+        //状态初始化 dp[i][j]：背包恰好装满时，对于前i个物品，容量为j的情况下，获得的最大价值
+        int[][] dp2 = new int[len + 1][volume + 1];
+        //初始化
+        for (int i = 0; i <= len; i++) {
+            dp2[i][0] = 0;//容量为0的背包可以什么也不装，达到恰好被装满的目标
+            for (int j = 1; j <= volume; j++) {//剩下的状态都是没有恰好被装满，需要转移状态
+                dp2[i][j] = Integer.MIN_VALUE;// 没有恰好装满，初始化为负无穷大 
+            }
+        }
+        //状态转移
+        for (int i = 1; i < len + 1; i++) { //遍历到第i件物品
+            for (int j = 1; j < volume + 1; j++) { //当前背包容积为j
+                if (v[i] >
+                        j) { //当前物品体积大于背包剩余容积，只能选择放弃
+                    dp2[i][j] = dp2[i - 1][j];
+                } else {//当前物品体积小于背包剩余容积，可以选择装入并修改背包容积和价值，也可以选择放弃价值不变
+                    dp2[i][j] = Math.max(dp2[i - 1][j - v[i]] + w[i], dp2[i - 1][j]);
+                }
+            }
+        }
+        //判断能否从初始状态转移过来
+        if (dp2[len][volume] < 0) {
+            dp2[len][volume] = 0;
+        }
+        System.out.println(dp2[len][volume]);
     }
 }
 ```
